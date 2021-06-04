@@ -6,20 +6,33 @@ class Maze extends React.Component {
     constructor(props) {
         super(props);
         this.mazeRef = React.createRef();
-        this.size = 50;
-        this.mazeBuilder = new MazeBuilder(this.size / 2, this.size / 2);
-        this.size++;
-        this.maze = this.mazeBuilder.maze;
-        this.mazeInterval = 0;
-        this.active = false;
+
+        this.reset();
 
         this.stepMaze = this.stepMaze.bind(this);
         this.start = this.start.bind(this);
+        this.reset = this.reset.bind(this);
     }
 
     componentDidMount() {
         this.mazeCtx = this.mazeRef.current.getContext("2d");
         this.mazeBuilder.draw(this.mazeCtx);
+    }
+
+    reset() {
+        this.size = 50;
+        this.mazeBuilder = new MazeBuilder(this.size / 2, this.size / 2);
+        this.size++;
+        this.maze = this.mazeBuilder.maze;
+        if (this.mazeInterval) {
+            clearInterval(this.mazeInterval);
+        }
+        this.mazeInterval = 0;
+        this.active = false;
+
+        if (this.mazeCtx) {
+            this.mazeBuilder.draw(this.mazeCtx);
+        }
     }
 
     start() {
@@ -77,6 +90,7 @@ class Maze extends React.Component {
           <div className="ca-container">
               <button id="start-maze" onClick={this.start}>Run Maze Solver</button>
               <button id="step-maze" onClick={this.stepMaze}>Step</button>
+              <button id="reset" onClick={this.reset}>Reset</button>
               <br />
               <canvas id="maze-canvas" width="1000px" height="1000px" ref={this.mazeRef}/>
           </div>
