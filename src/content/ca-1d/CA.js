@@ -12,8 +12,7 @@ class CA extends React.Component {
         this.wolframRef = React.createRef();
         this.state = {
             wolframNumber: 0,
-            randomizeStartState: false,
-            runs: 1
+            randomizeStartState: false
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.updateWolframNumber = this.updateWolframNumber.bind(this);
@@ -30,6 +29,7 @@ class CA extends React.Component {
     componentDidMount() {
         this.simCtx = this.simRef.current.getContext("2d");
         this.wolframCtx = this.wolframRef.current.getContext("2d");
+        this.drawWolframPattern();
     }
 
     handleInputChange(event) {
@@ -233,15 +233,8 @@ class CA extends React.Component {
                          name="randomizeStartState"
                          checked={this.state.randomizeStartState}
                          onChange={this.handleInputChange} />
-                  <label htmlFor="runs">Runs: </label>
-                  <input type="number"
-                         id="runs"
-                         name="runs"
-                         value={this.state.runs}
-                         onChange={this.handleInputChange}/>
-                  <button id="run-simulation">Run Simulation</button>
                   <br />
-                  <canvas id="simulation" width="1500px" height="700px" ref={this.simRef}/>
+                  <canvas id="simulation" width="1500px" height="675px" ref={this.simRef}/>
               </div>
           </div>
         );
