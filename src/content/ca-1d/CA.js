@@ -14,12 +14,14 @@ class CA extends React.Component {
             wolframNumber: 0,
             randomizeStartState: false
         };
+
         this.handleInputChange = this.handleInputChange.bind(this);
         this.updateWolframNumber = this.updateWolframNumber.bind(this);
         this.start = this.start.bind(this);
         this.play = this.play.bind(this);
         this.stepForward = this.stepForward.bind(this);
         this.stepBackward = this.stepBackward.bind(this);
+
         this.wolframArray = [0, 0, 0, 0, 0, 0, 0, 0];
         this.graphicsArray = [];
         this.playing = false;
