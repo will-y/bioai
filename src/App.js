@@ -1,13 +1,16 @@
 import './App.css';
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import Page from "./content/Page";
+import CA from "./content/ca-1d/CA";
 
 
 function App() {
 
   const pages = [
     {name: "Home", path: "/"},
-    {name: "Cellular Automata", path: "/ca"},
+    {name: "1D Cellular Automata", path: "/ca-1d"},
+    {name: "Game of Life", path: "/game-of-life"},
+    {name: "Maze-Solver", path: "/maze"},
     {name: "L System", path: "/l-system"},
     {name: "Biods", path: "/biods"}
   ]
@@ -16,11 +19,20 @@ function App() {
       <div className="container">
         <Router>
           <Switch>
-            <Route path="/ca">
+            <Route path="/ca-1d">
               <Page pages={pages}>
-                <p>ca</p>
+                <CA />
               </Page>
+            </Route>
+            <Route path="/game-of-life">
+              <Page pages={pages}>
 
+              </Page>
+            </Route>
+            <Route path="/maze">
+              <Page pages={pages}>
+
+              </Page>
             </Route>
             <Route path="/l-system">
               <Page pages={pages}>
