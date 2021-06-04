@@ -1,0 +1,8 @@
+.page {
+    min-height: 94vh;
+}
+
+.page-content {
+    min-height: 88vh;
+    margin-top: 6vh;
+}

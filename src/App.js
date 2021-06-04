@@ -1,24 +1,45 @@
-import logo from './logo.svg';
 import './App.css';
+import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
+import Page from "./content/Page";
+
 
 function App() {
+
+  const pages = [
+    {name: "Home", path: "/"},
+    {name: "Cellular Automata", path: "/ca"},
+    {name: "L System", path: "/l-system"},
+    {name: "Biods", path: "/biods"}
+  ]
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <div className="container">
+        <Router>
+          <Switch>
+            <Route path="/ca">
+              <Page pages={pages}>
+                <p>ca</p>
+              </Page>
+
+            </Route>
+            <Route path="/l-system">
+              <Page pages={pages}>
+                <p>L System</p>
+              </Page>
+            </Route>
+            <Route path="/biods">
+              <Page pages={pages}>
+                <p>Biods</p>
+              </Page>
+            </Route>
+            <Route path="/">
+              <Page pages={pages}>
+                <p>Home</p>
+              </Page>
+            </Route>
+          </Switch>
+        </Router>
+      </div>
   );
 }
 
