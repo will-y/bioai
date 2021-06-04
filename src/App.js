@@ -3,6 +3,7 @@ import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import Page from "./content/Page";
 import CA from "./content/ca-1d/CA";
 import GameOfLife from "./content/game-of-life/GameOfLife";
+import Maze from "./content/maze/Maze";
 
 
 function App() {
@@ -32,7 +33,7 @@ function App() {
             </Route>
             <Route path="/maze">
               <Page pages={pages}>
-
+                <Maze />
               </Page>
             </Route>
             <Route path="/l-system">
