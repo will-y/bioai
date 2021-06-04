@@ -2,6 +2,7 @@ import './App.css';
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import Page from "./content/Page";
 import CA from "./content/ca-1d/CA";
+import GameOfLife from "./content/game-of-life/GameOfLife";
 
 
 function App() {
@@ -26,7 +27,7 @@ function App() {
             </Route>
             <Route path="/game-of-life">
               <Page pages={pages}>
-
+                <GameOfLife />
               </Page>
             </Route>
             <Route path="/maze">

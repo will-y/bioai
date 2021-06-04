@@ -2,6 +2,8 @@ import React from 'react';
 import './CA.css';
 
 const squareSize = 25;
+const cellsPerRow = 50;
+const maxRows = 27;
 
 class CA extends React.Component {
     constructor(props) {
@@ -15,7 +17,14 @@ class CA extends React.Component {
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.updateWolframNumber = this.updateWolframNumber.bind(this);
+        this.start = this.start.bind(this);
+        this.play = this.play.bind(this);
+        this.stepForward = this.stepForward.bind(this);
+        this.stepBackward = this.stepBackward.bind(this);
         this.wolframArray = [0, 0, 0, 0, 0, 0, 0, 0];
+        this.graphicsArray = [];
+        this.playing = false;
+        this.interval = 0;
     }
 
     componentDidMount() {
@@ -32,9 +41,112 @@ class CA extends React.Component {
         });
     }
 
+    // Click Handlers
     updateWolframNumber() {
         this.wolframArray = this.calculateBinaryArray(this.state.wolframNumber);
         this.drawWolframPattern();
+    }
+
+    start() {
+        this.simCtx.clearRect(0, 0, this.simRef.current.width, this.simRef.current.width);
+        this.initializeArray(this.state.randomizeStartState);
+        this.drawArray();
+    }
+
+    play() {
+        if (this.playing) {
+            clearInterval(this.interval);
+            document.getElementById('play').textContent = 'Play';
+        } else {
+            document.getElementById('play').textContent = 'Pause';
+            let t = this;
+            this.interval = setInterval(function() {
+               t.stepForward(true);
+            }, 100);
+        }
+        this.playing = !this.playing;
+    }
+
+    // Other
+    stepForward(showGraphics) {
+        const current = this.graphicsArray[this.graphicsArray.length - 1];
+        let next = [];
+        // wraps around
+        for (let i = 0; i < current.length; i++) {
+            if (i === 0) {
+                next.push(this.calculateNextValue(current[current.length - 1], current[i], current[i + 1]));
+            } else if (i === current.length - 1) {
+                next.push(this.calculateNextValue(current[i - 1], current[i], current[0]));
+            } else {
+                next.push(this.calculateNextValue(current[i - 1], current[i], current[i + 1]));
+            }
+        }
+
+        this.graphicsArray.push(next);
+        if (showGraphics) {
+            this.drawArray();
+        }
+    }
+
+    stepBackward() {
+        this.graphicsArray = this.graphicsArray.slice(0, this.graphicsArray.length - 1);
+        this.simCtx.clearRect(0, 0, this.simRef.current.width, this.simRef.current.height);
+        this.drawArray();
+    }
+
+    calculateNextValue(left, center, right) {
+        return this.wolframArray[left * 2 ** 2 + center * 2 + right]
+    }
+
+    drawArray() {
+        let row = 0;
+        let index = 0;
+        let startIndex = 0;
+        let t = this;
+        if (this.graphicsArray.length > maxRows) {
+            startIndex = this.graphicsArray.length - maxRows;
+        }
+        this.graphicsArray.forEach(function(rowArray) {
+            if (index >= startIndex) {
+                for (let i = 0; i < rowArray.length; i++) {
+                    if (rowArray[i] === 1) {
+                        t.simCtx.fillStyle = 'green';
+                    } else {
+                        t.simCtx.fillStyle = 'white';
+                    }
+
+                    t.simCtx.fillRect(i * squareSize, row * squareSize, squareSize, squareSize);
+                    t.simCtx.beginPath();
+                    t.simCtx.strokeStyle = 'black';
+                    t.simCtx.rect(i * squareSize, row * squareSize, squareSize, squareSize);
+                    t.simCtx.stroke();
+                }
+                row++;
+            }
+            index++;
+        });
+    }
+
+    initializeArray(randomize) {
+        this.graphicsArray = []
+        let toAdd = []
+        for (let i = 0; i < cellsPerRow; i++) {
+            if (randomize) {
+                if (Math.random() >= 0.5) {
+                    toAdd.push(1)
+                } else {
+                    toAdd.push(0)
+                }
+            } else {
+                if (i === Math.floor(cellsPerRow / 2)) {
+                    toAdd.push(1);
+                } else {
+                    toAdd.push(0);
+                }
+            }
+        }
+
+        this.graphicsArray.push(toAdd);
     }
 
     drawWolframPattern() {
@@ -111,10 +223,10 @@ class CA extends React.Component {
                   <button id="select" onClick={this.updateWolframNumber}>Select</button>
               </div>
               <div>
-                  <button id="start">Start</button>
-                  <button id="step-back">{"<"}</button>
-                  <button id="play">Play</button>
-                  <button id="step-forward">{">"}</button>
+                  <button id="start" onClick={this.start}>Start</button>
+                  <button id="step-back" onClick={this.stepBackward}>{"<"}</button>
+                  <button id="play" onClick={this.play}>Play</button>
+                  <button id="step-forward" onClick={() => this.stepForward(true)}>{">"}</button>
                   <label htmlFor="randomize-start-state">Randomize?</label>
                   <input type="checkbox"
                          id="randomize-start-state"
