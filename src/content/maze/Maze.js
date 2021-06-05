@@ -1,5 +1,6 @@
 import React from 'react';
 import './Maze.css';
+import '../Page.css';
 import MazeBuilder from './MazeBuilder';
 
 class Maze extends React.Component {

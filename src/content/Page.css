@@ -6,3 +6,9 @@
     min-height: 88vh;
     margin-top: 6vh;
 }
+
+.ca-container {
+    width: 80%;
+    margin-left: 10%;
+    margin-top: 5%;
+}

@@ -1,5 +1,6 @@
 import React from 'react';
 import './CA.css';
+import '../Page.css';
 
 const squareSize = 25;
 const cellsPerRow = 50;

@@ -1,5 +1,6 @@
 import React from 'react';
 import './GameOfLife.css';
+import '../Page.css';
 
 const gridCount = 50;
 const gridSize = 13;

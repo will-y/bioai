@@ -4,6 +4,7 @@ import Page from "./content/Page";
 import CA from "./content/ca-1d/CA";
 import GameOfLife from "./content/game-of-life/GameOfLife";
 import Maze from "./content/maze/Maze";
+import Boids from "./content/boids/Boids";
 
 
 function App() {
@@ -43,7 +44,7 @@ function App() {
             </Route>
             <Route path="/biods">
               <Page pages={pages}>
-                <p>Biods</p>
+                <Boids />
               </Page>
             </Route>
             <Route path="/">
