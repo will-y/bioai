@@ -5,6 +5,7 @@ import CA from "./content/ca-1d/CA";
 import GameOfLife from "./content/game-of-life/GameOfLife";
 import Maze from "./content/maze/Maze";
 import Boids from "./content/boids/Boids";
+import LSystem from "./content/l-system/LSystem"
 
 
 function App() {
@@ -39,7 +40,7 @@ function App() {
             </Route>
             <Route path="/l-system">
               <Page pages={pages}>
-                <p>L System</p>
+                <LSystem />
               </Page>
             </Route>
             <Route path="/biods">
