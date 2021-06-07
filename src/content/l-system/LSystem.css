@@ -1,0 +1,31 @@
+.l-container {
+    width: 80%;
+    margin-left: 10%;
+    display: flex;
+    flex-direction: row;
+}
+
+.rule-input {
+    display: inline;
+}
+
+.rule-label {
+    display: inline;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.rule-container {
+    margin-top: 10px;
+}
+
+.add-rule {
+    margin-top: 10px;
+}
+
+.iterations {
+    margin-top: 10px;
+}

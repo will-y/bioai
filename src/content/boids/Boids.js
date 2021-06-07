@@ -66,7 +66,6 @@ class Boids extends React.Component {
     }
 
     reset() {
-        let t = this;
         this.setState({
             boidRadius: 4,
             repelDistance: 25,
