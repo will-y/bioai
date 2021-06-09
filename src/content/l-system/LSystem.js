@@ -2,6 +2,9 @@ import React from 'react';
 import '../Page.css';
 import './LSystem.css';
 
+const width = 1000
+const height = 700;
+
 class LSystem extends React.Component {
     constructor(props) {
         super(props);
@@ -14,7 +17,11 @@ class LSystem extends React.Component {
             rule0End: "",
             rule1Start: "",
             rule1End: "",
-            axiom: ""
+            axiom: "",
+            rotateAngle: Math.PI / 4,
+            distance: 5,
+            xStart: width / 2,
+            yStart: height - 10
         }
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -31,8 +38,13 @@ class LSystem extends React.Component {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
+
         this.setState({
             [name]: value
+        }, () => {
+            // if (name === "xStart" || name === "yStart" || name === "distance" || name === "rotateAngle" || name === "iterations") {
+
+                this.runSystem();
         });
     }
 
@@ -54,7 +66,6 @@ class LSystem extends React.Component {
             }
         }
 
-        console.log(rules);
         return rules;
     }
 
@@ -67,7 +78,9 @@ class LSystem extends React.Component {
             axiom = this.applyRules(rules, axiom);
         }
 
-        console.log(axiom);
+        // draw
+
+        this.drawString(axiom);
 
         return axiom;
     }
@@ -87,6 +100,59 @@ class LSystem extends React.Component {
         }
 
         return result;
+    }
+
+    // Options:
+    // - = rotate left
+    // + = rotate right
+    // [ = push to stack
+    // ] = pop from stack
+    // Anything else: Move forward
+    drawString(toDraw) {
+        let x = parseFloat(this.state.xStart);
+        let y = parseFloat(this.state.yStart);
+        let currentAngle = Math.PI / 2;
+        const branches = [];
+
+        this.ctx.fillStyle = 'black';
+        this.ctx.clearRect(0, 0, width, height);
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y);
+
+        for (let i = 0; i < toDraw.length; i++) {
+            const char = toDraw.charAt(i);
+
+            switch (char) {
+                case '-':
+                    currentAngle -= parseFloat(this.state.rotateAngle);
+                    break;
+                case '+':
+                    currentAngle += parseFloat(this.state.rotateAngle);
+                    break;
+                case '[':
+                    branches.push({
+                        x: x,
+                        y: y,
+                        currentAngle: currentAngle
+                    });
+                    break;
+                case ']':
+                    const newPosition = branches.pop();
+                    x = newPosition.x;
+                    y = newPosition.y;
+                    currentAngle = newPosition.currentAngle;
+
+                    this.ctx.moveTo(x, y);
+                    break;
+                default:
+                    x = x + Math.cos(currentAngle) * this.state.distance;
+                    y = y - Math.sin(currentAngle) * this.state.distance;
+
+                    this.ctx.lineTo(x, y);
+                    break;
+            }
+        }
+        this.ctx.stroke();
     }
 
     render() {
@@ -119,13 +185,50 @@ class LSystem extends React.Component {
                         );
                     })}
                     <button className="add-rule" onClick={this.addRule}>Add Rule</button>
+                    <h3>Settings</h3>
+                    <label htmlFor="iterations">Iterations: {this.state.iterations}</label>
                     <input className="iterations"
+                           type="range"
+                           min={1}
+                           max={10}
                            value={this.state.iterations}
                            onChange={this.handleInputChange}
                            name="iterations"/>
-                    <button className="add-rule" onClick={this.runSystem}>Draw</button>
+                    <label htmlFor="x" id="x-label">X Start: {this.state.xStart}</label>
+                    <input type="range"
+                           min={0}
+                           max={width}
+                           value={this.state.xStart}
+                           id="x"
+                           name="xStart"
+                           onChange={this.handleInputChange}/>
+                    <label htmlFor="y" id="y-label">Y Start: {this.state.yStart}</label>
+                    <input type="range"
+                           min={0}
+                           max={height}
+                           value={this.state.yStart}
+                           id="y"
+                           name="yStart"
+                           onChange={this.handleInputChange}/>
+                    <label htmlFor="distance" id="distance">Distance: {this.state.distance}</label>
+                    <input type="range"
+                           min={1}
+                           max={200}
+                           value={this.state.distance}
+                           id="distance"
+                           name="distance"
+                           onChange={this.handleInputChange}/>
+                    <label htmlFor="rotate" id="distance">Rotate Angle: {parseFloat(this.state.rotateAngle).toFixed(3)}</label>
+                    <input type="range"
+                           min={0}
+                           max={Math.PI * 2}
+                           value={this.state.rotateAngle}
+                           id="rotate"
+                           name="rotateAngle"
+                           onChange={this.handleInputChange}
+                           step={0.001}/>
                 </div>
-                <canvas width="1000px" height="700px" ref={this.lSystemRef}/>
+                <canvas width="1000px" height="700px" ref={this.lSystemRef} id="canvas"/>
             </div>
             );
     }

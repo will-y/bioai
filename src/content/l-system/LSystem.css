@@ -26,6 +26,8 @@
     margin-top: 10px;
 }
 
-.iterations {
-    margin-top: 10px;
+#canvas {
+    border: 1px solid gray;
+    margin-top: 5px;
+    margin-left: 5px;
 }
