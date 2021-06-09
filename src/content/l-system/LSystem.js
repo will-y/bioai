@@ -13,12 +13,14 @@ class LSystem extends React.Component {
             rule0Start: "",
             rule0End: "",
             rule1Start: "",
-            rule1End: ""
+            rule1End: "",
+            axiom: ""
         }
 
         this.handleInputChange = this.handleInputChange.bind(this);
         this.addRule = this.addRule.bind(this);
         this.createRules = this.createRules.bind(this);
+        this.runSystem = this.runSystem.bind(this);
     }
 
     componentDidMount() {
@@ -45,7 +47,7 @@ class LSystem extends React.Component {
     }
 
     createRules() {
-        let rules = new Map();
+        const rules = new Map();
         for (let i = 0; i < this.nextRule; i++) {
             if (this.state[`rule${i}Start`] !== '' && this.state[`rule${i}End`] !== '') {
                 rules.set(this.state[`rule${i}Start`], this.state[`rule${i}End`]);
@@ -53,18 +55,38 @@ class LSystem extends React.Component {
         }
 
         console.log(rules);
+        return rules;
     }
 
-    runSystem(axiom, rules, iterations) {
+    runSystem() {
+        let axiom = this.state.axiom;
+        const iterations = this.state.iterations;
+        const rules = this.createRules();
+
         for (let i = 0; i < iterations; i++) {
             axiom = this.applyRules(rules, axiom);
         }
+
+        console.log(axiom);
 
         return axiom;
     }
 
     applyRules(rules, axiom) {
+        let result = '';
 
+        for (let i = 0; i < axiom.length; i++) {
+            const char = axiom.charAt(i);
+            const val = rules.get(char);
+
+            if (val) {
+                result = result.concat(val);
+            } else {
+                result = result.concat(char.toString());
+            }
+        }
+
+        return result;
     }
 
     render() {
@@ -73,7 +95,10 @@ class LSystem extends React.Component {
                 <div className="form-container">
                     <div className="rule-container">
                         <label htmlFor="axiom">Axiom: </label>
-                        <input className="rule-input" />
+                        <input className="rule-input"
+                               name="axiom"
+                               value={this.state.axiom}
+                               onChange={this.handleInputChange}/>
                     </div>
                     {this.state.ruleInputs.map((item, index) => {
                         return (
@@ -98,7 +123,7 @@ class LSystem extends React.Component {
                            value={this.state.iterations}
                            onChange={this.handleInputChange}
                            name="iterations"/>
-                    <button className="add-rule" onClick={this.createRules}>Draw</button>
+                    <button className="add-rule" onClick={this.runSystem}>Draw</button>
                 </div>
                 <canvas width="1000px" height="700px" ref={this.lSystemRef}/>
             </div>
