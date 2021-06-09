@@ -12,14 +12,14 @@ class LSystem extends React.Component {
         this.nextRule = 2;
         this.state = {
             ruleInputs: ["rule0", "rule1"],
-            iterations: 6,
-            rule0Start: "",
-            rule0End: "",
+            iterations: 5,
+            rule0Start: "A",
+            rule0End: "A[+A][-A]",
             rule1Start: "",
             rule1End: "",
-            axiom: "",
+            axiom: "A",
             rotateAngle: Math.PI / 4,
-            distance: 5,
+            distance: 10,
             xStart: width / 2,
             yStart: height - 10
         }
@@ -32,6 +32,7 @@ class LSystem extends React.Component {
 
     componentDidMount() {
         this.ctx = this.lSystemRef.current.getContext("2d");
+        this.runSystem();
     }
 
     handleInputChange(event) {
