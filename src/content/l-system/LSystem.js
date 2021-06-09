@@ -10,6 +10,7 @@ class LSystem extends React.Component {
         super(props);
         this.lSystemRef = React.createRef();
         this.nextRule = 2;
+        this.savedString = "";
         this.state = {
             ruleInputs: ["rule0", "rule1"],
             iterations: 5,
@@ -43,9 +44,11 @@ class LSystem extends React.Component {
         this.setState({
             [name]: value
         }, () => {
-            // if (name === "xStart" || name === "yStart" || name === "distance" || name === "rotateAngle" || name === "iterations") {
-
+            if (name === "xStart" || name === "yStart" || name === "distance" || name === "rotateAngle") {
+                this.drawString(this.savedString);
+            } else {
                 this.runSystem();
+            }
         });
     }
 
@@ -81,6 +84,7 @@ class LSystem extends React.Component {
 
         // draw
 
+        this.savedString = axiom;
         this.drawString(axiom);
 
         return axiom;
