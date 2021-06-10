@@ -15,7 +15,8 @@ class Boids extends React.Component {
             repelDistance: 25,
             speedLimit: 20,
             attraction: 100,
-            dotAttraction: 50
+            dotAttraction: 50,
+            predator: false
         };
 
         this.playing = false;
@@ -73,16 +74,16 @@ class Boids extends React.Component {
             attraction: 100,
             dotAttraction: 50
         }, () => {
+            this.attractorY = -1;
+            this.attractorX = -1;
+            this.initializeBoids();
+            this.playing = false;
+            if (this.interval) {
+                clearInterval(this.interval);
+            }
+            document.getElementById('start').textContent = 'Start';
             this.drawBoids();
         });
-        this.attractorY = -1;
-        this.attractorX = -1;
-        this.initializeBoids();
-        this.playing = false;
-        if (this.interval) {
-            clearInterval(this.interval);
-        }
-        document.getElementById('start').textContent = 'Start';
     }
 
     canvasClickHandler(e) {
@@ -105,7 +106,6 @@ class Boids extends React.Component {
     }
 
     drawBoids() {
-        console.log(this.state.boidRadius)
         this.ctx.clearRect(0, 0, width, height);
         this.ctx.fillStyle = 'green';
         for (let i = 0; i < numBoids; i++) {
@@ -123,11 +123,13 @@ class Boids extends React.Component {
         }
 
         // predator
-        this.ctx.fillStyle = 'red';
-        if (this.rx !== -1) {
-            this.ctx.beginPath();
-            this.ctx.arc(this.rx, this.ry, this.state.boidRadius, 0, Math.PI * 2);
-            this.ctx.fill();
+        if (this.state.predator) {
+            this.ctx.fillStyle = 'red';
+            if (this.rx !== -1) {
+                this.ctx.beginPath();
+                this.ctx.arc(this.rx, this.ry, this.state.boidRadius, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
         }
     }
 
@@ -138,7 +140,7 @@ class Boids extends React.Component {
             const v3 = this.rule3(i);
             const v4 = this.rule4(i);
             const v5 = this.rule5(i);
-            const v6 = this.rule6(i);
+            const v6 = this.state.predator ? this.rule6(i) : [0, 0];
 
             const v = this.limitVelocity(boids[i].vx + v1[0] + v2[0] + v3[0] + v4[0] + v5[0] + v6[0], boids[i].vy + v1[1] + v2[1] + v3[1] + v4[1] + v5[1] + v6[1])
 
@@ -149,16 +151,18 @@ class Boids extends React.Component {
         }
 
         // predator
-        if (this.rx !== -1) {
-            const v1 = this.rule1_pos(this.rx, this.ry, 0);
-            const v4 = this.rule4_pos(this.rx, this.ry);
+        if (this.state.predator) {
+            if (this.rx !== -1) {
+                const v1 = this.rule1_pos(this.rx, this.ry, 0);
+                const v4 = this.rule4_pos(this.rx, this.ry);
 
-            const v = this.limitVelocity(this.rvx + v1[0] + v4[0], this.rvy + v1[1] + v4[1]);
+                const v = this.limitVelocity(this.rvx + v1[0] + v4[0], this.rvy + v1[1] + v4[1]);
 
-            this.rvx = v[0];
-            this.rvy = v[1];
-            this.rx = this.rx + this.rvx;
-            this.ry = this.ry + this.rvy;
+                this.rvx = v[0];
+                this.rvy = v[1];
+                this.rx = this.rx + this.rvx;
+                this.ry = this.ry + this.rvy;
+            }
         }
 
         this.drawBoids();
@@ -350,6 +354,13 @@ class Boids extends React.Component {
                            id="dot-attraction"
                            name="dotAttraction"
                            onChange={this.handleInputChange}/>
+                    <div>
+                        <label htmlFor="predator" id="predator-label">Predator?</label>
+                        <input type="checkbox"
+                               checked={this.state.predator}
+                               name="predator"
+                               onChange={this.handleInputChange} />
+                    </div>
                 </div>
             </div>
         );
