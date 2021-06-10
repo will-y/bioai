@@ -2,8 +2,8 @@ import React from 'react';
 import '../Page.css';
 import './LSystem.css';
 
-const width = 1000
-const height = 700;
+let width = window.innerWidth * 3 / 4;
+let height = window.innerHeight * 5 / 6;
 
 class LSystem extends React.Component {
     constructor(props) {
@@ -233,7 +233,7 @@ class LSystem extends React.Component {
                            onChange={this.handleInputChange}
                            step={0.001}/>
                 </div>
-                <canvas width="1000px" height="700px" ref={this.lSystemRef} id="canvas"/>
+                <canvas width={width} height={height} ref={this.lSystemRef} id="canvas"/>
             </div>
             );
     }
