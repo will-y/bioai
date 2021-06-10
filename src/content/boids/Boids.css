@@ -7,3 +7,8 @@
     flex-wrap: wrap;
     flex-direction: row;
 }
+
+.sliders {
+    display: flex;
+    flex-direction: column;
+}

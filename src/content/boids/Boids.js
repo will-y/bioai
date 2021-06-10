@@ -304,6 +304,7 @@ class Boids extends React.Component {
                 <div className="sliders">
                     <button id="start" onClick={this.start}>Start</button>
                     <button id="reset" onClick={this.reset}>Reset</button>
+                    <label htmlFor="radius" id="radius-label">Radius: {this.state.boidRadius}</label>
                     <input type="range"
                            className="boids-input"
                            min="1"
@@ -313,8 +314,7 @@ class Boids extends React.Component {
                            name="boidRadius"
                            onChange={this.handleInputChange}
                            onInput={this.drawBoids}/>
-                    <label htmlFor="radius" id="radius-label">Radius: {this.state.boidRadius}</label>
-
+                    <label htmlFor="repel" id="repel-label">Repel: {this.state.repelDistance}</label>
                     <input type="range"
                            className="boids-input"
                            min="0"
@@ -323,8 +323,7 @@ class Boids extends React.Component {
                            id="repel"
                            name="repelDistance"
                            onChange={this.handleInputChange}/>
-                    <label htmlFor="repel" id="repel-label">Repel: {this.state.repelDistance}</label>
-
+                    <label htmlFor="speed" id="speed-label">Speed Limit: {this.state.speedLimit}</label>
                     <input type="range"
                            className="boids-input"
                            min="0"
@@ -333,8 +332,7 @@ class Boids extends React.Component {
                            id="speed"
                            name="speedLimit"
                            onChange={this.handleInputChange}/>
-                    <label htmlFor="speed" id="speed-label">Speed Limit: {this.state.speedLimit}</label>
-
+                    <label htmlFor="attraction" id="attraction-label">CoM Attraction: {this.state.attraction}</label>
                     <input type="range"
                            className="boids-input"
                            min="1"
@@ -343,8 +341,7 @@ class Boids extends React.Component {
                            id="attraction"
                            name="attraction"
                            onChange={this.handleInputChange}/>
-                    <label htmlFor="attraction" id="attraction-label">CoM Attraction: {this.state.attraction}</label>
-
+                    <label htmlFor="dot-attraction" id="dot-attraction-label">Dot Attraction: {this.state.dotAttraction}</label>
                     <input type="range"
                            className="boids-input"
                            min="1"
@@ -353,7 +350,6 @@ class Boids extends React.Component {
                            id="dot-attraction"
                            name="dotAttraction"
                            onChange={this.handleInputChange}/>
-                    <label htmlFor="dot-attraction" id="dot-attraction-label">Dot Attraction: {this.state.dotAttraction}</label>
                 </div>
             </div>
         );
