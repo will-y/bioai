@@ -305,6 +305,7 @@ class Boids extends React.Component {
                     <button id="start" onClick={this.start}>Start</button>
                     <button id="reset" onClick={this.reset}>Reset</button>
                     <input type="range"
+                           className="boids-input"
                            min="1"
                            max="20"
                            value={this.state.boidRadius}
@@ -315,6 +316,7 @@ class Boids extends React.Component {
                     <label htmlFor="radius" id="radius-label">Radius: {this.state.boidRadius}</label>
 
                     <input type="range"
+                           className="boids-input"
                            min="0"
                            max="200"
                            value={this.state.repelDistance}
@@ -324,6 +326,7 @@ class Boids extends React.Component {
                     <label htmlFor="repel" id="repel-label">Repel: {this.state.repelDistance}</label>
 
                     <input type="range"
+                           className="boids-input"
                            min="0"
                            max="200"
                            value={this.state.speedLimit}
@@ -333,6 +336,7 @@ class Boids extends React.Component {
                     <label htmlFor="speed" id="speed-label">Speed Limit: {this.state.speedLimit}</label>
 
                     <input type="range"
+                           className="boids-input"
                            min="1"
                            max="200"
                            value={this.state.attraction}
@@ -342,6 +346,7 @@ class Boids extends React.Component {
                     <label htmlFor="attraction" id="attraction-label">CoM Attraction: {this.state.attraction}</label>
 
                     <input type="range"
+                           className="boids-input"
                            min="1"
                            max="200"
                            value={this.state.dotAttraction}
