@@ -1,0 +1,38 @@
+.contacts-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    align-content: center;
+    margin-top: 100px;
+}
+
+.contact-wrapper {
+    margin: 20px;
+}
+
+.contact {
+    background-color: #404f6d;
+    min-height: 250px;
+    min-width: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 50px;
+    border: 1px solid #404f6d;
+    transition: transform 250ms ease 0s;
+    color: white;
+    text-decoration: none;
+}
+
+.contact:hover {
+    transform: scale(1.05);
+    transition: transform 200ms ease 0s;
+    text-decoration: none;
+    color: white;
+}
+
+.contact-text {
+    text-align: center;
+}

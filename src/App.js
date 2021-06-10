@@ -7,6 +7,7 @@ import GameOfLife from "./content/game-of-life/GameOfLife";
 import Maze from "./content/maze/Maze";
 import Boids from "./content/boids/Boids";
 import LSystem from "./content/l-system/LSystem"
+import Home from "./content/home/Home";
 
 function App() {
 
@@ -16,7 +17,7 @@ function App() {
     {name: "Game of Life", path: "/game-of-life"},
     {name: "Maze-Solver", path: "/maze"},
     {name: "L System", path: "/l-system"},
-    {name: "Biods", path: "/biods"}
+    {name: "Boids", path: "/boids"}
   ]
 
   return (
@@ -43,14 +44,14 @@ function App() {
                 <LSystem />
               </Page>
             </Route>
-            <Route path="/biods">
+            <Route path="/boids">
               <Page pages={pages}>
                 <Boids />
               </Page>
             </Route>
             <Route path="/">
               <Page pages={pages}>
-                <p>Home</p>
+                <Home />
               </Page>
             </Route>
           </Switch>
