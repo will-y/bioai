@@ -3,6 +3,9 @@
     margin-left: 10%;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+    padding-top: 10px;
+    height: 100%;
 }
 
 .rule-input {
@@ -16,6 +19,14 @@
 .form-container {
     display: flex;
     flex-direction: column;
+    flex: 0 0 25%;
+    max-width: 25%;
+    min-width: 200px;
+}
+
+.canvas-wrapper {
+    flex: 0 0 75%;
+    max-width: 75%;
 }
 
 .rule-container {

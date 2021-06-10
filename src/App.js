@@ -1,3 +1,4 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import Page from "./content/Page";
@@ -6,7 +7,6 @@ import GameOfLife from "./content/game-of-life/GameOfLife";
 import Maze from "./content/maze/Maze";
 import Boids from "./content/boids/Boids";
 import LSystem from "./content/l-system/LSystem"
-
 
 function App() {
 
@@ -20,7 +20,7 @@ function App() {
   ]
 
   return (
-      <div className="container">
+      <div className="fill-container">
         <Router>
           <Switch>
             <Route path="/ca-1d">

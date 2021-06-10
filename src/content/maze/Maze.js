@@ -93,7 +93,7 @@ class Maze extends React.Component {
               <button id="step-maze" onClick={this.stepMaze}>Step</button>
               <button id="reset" onClick={this.reset}>Reset</button>
               <br />
-              <canvas id="maze-canvas" width="1000px" height="1000px" ref={this.mazeRef}/>
+              <canvas id="maze-canvas" width="1000px" height="550px" ref={this.mazeRef}/>
           </div>
         );
     }

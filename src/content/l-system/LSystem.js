@@ -2,13 +2,14 @@ import React from 'react';
 import '../Page.css';
 import './LSystem.css';
 
-let width = window.innerWidth * 3 / 4;
-let height = window.innerHeight * 5 / 6;
+const width = window.innerWidth * 3 / 4;
+const height = window.innerHeight * 5 / 6;
 
 class LSystem extends React.Component {
     constructor(props) {
         super(props);
         this.lSystemRef = React.createRef();
+        this.canvasWrapperRef = React.createRef();
         this.nextRule = 2;
         this.savedString = "";
         this.state = {
@@ -22,19 +23,40 @@ class LSystem extends React.Component {
             rotateAngle: Math.PI / 4,
             distance: 10,
             xStart: width / 2,
-            yStart: height - 10
+            yStart: height - 50,
+            width: width,
+            height: height
         }
 
         this.handleInputChange = this.handleInputChange.bind(this);
         this.addRule = this.addRule.bind(this);
         this.createRules = this.createRules.bind(this);
         this.runSystem = this.runSystem.bind(this);
+        this.updateCanvas = this.updateCanvas.bind(this);
     }
 
     componentDidMount() {
         this.ctx = this.lSystemRef.current.getContext("2d");
         this.runSystem();
+        this.updateCanvas();
+        window.addEventListener('resize', this.updateCanvas);
     }
+
+    updateCanvas() {
+        if (this.canvasWrapperRef.current) {
+            this.setState({
+                width: this.canvasWrapperRef.current.offsetWidth,
+                height: Math.min(this.canvasWrapperRef.current.offsetHeight, window.innerHeight - 100),
+                xStart: this.canvasWrapperRef.current.offsetWidth / 2,
+                yStart: this.canvasWrapperRef.current.offsetHeight - 50
+            }, () => {
+                this.drawString(this.savedString);
+            });
+        } else {
+            console.log("???");
+        }
+    }
+
 
     handleInputChange(event) {
         const target = event.target;
@@ -120,7 +142,7 @@ class LSystem extends React.Component {
         const branches = [];
 
         this.ctx.fillStyle = 'black';
-        this.ctx.clearRect(0, 0, width, height);
+        this.ctx.clearRect(0, 0, this.state.width, this.state.height);
         this.ctx.beginPath();
         this.ctx.moveTo(x, y);
 
@@ -202,7 +224,7 @@ class LSystem extends React.Component {
                     <label htmlFor="x" id="x-label">X Start: {this.state.xStart}</label>
                     <input type="range"
                            min={0}
-                           max={width}
+                           max={this.state.width}
                            value={this.state.xStart}
                            id="x"
                            name="xStart"
@@ -210,7 +232,7 @@ class LSystem extends React.Component {
                     <label htmlFor="y" id="y-label">Y Start: {this.state.yStart}</label>
                     <input type="range"
                            min={0}
-                           max={height}
+                           max={this.state.height}
                            value={this.state.yStart}
                            id="y"
                            name="yStart"
@@ -233,7 +255,9 @@ class LSystem extends React.Component {
                            onChange={this.handleInputChange}
                            step={0.001}/>
                 </div>
-                <canvas width={width} height={height} ref={this.lSystemRef} id="canvas"/>
+                <div className="canvas-wrapper" ref={this.canvasWrapperRef}>
+                    <canvas width={this.state.width} height={this.state.height} ref={this.lSystemRef} id="canvas"/>
+                </div>
             </div>
             );
     }
