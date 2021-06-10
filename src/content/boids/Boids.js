@@ -107,7 +107,7 @@ class Boids extends React.Component {
 
     drawBoids() {
         this.ctx.clearRect(0, 0, width, height);
-        this.ctx.fillStyle = 'green';
+        this.ctx.fillStyle = '#00ff1d';
         for (let i = 0; i < numBoids; i++) {
             const boid = boids[i];
             this.ctx.beginPath();
