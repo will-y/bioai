@@ -1,9 +1,11 @@
 .popover-container {
     position: fixed;
     top: 0;
-    right: 0;
+    right: -33%;
     height: 100%;
     width: 33%;
     background-color: blue;
     visibility: hidden;
+    opacity: 0;
+    transition: visibility 1s, opacity 1s, right 1s;
 }

@@ -9,8 +9,11 @@ class PopoverToggle extends React.Component {
 
     togglePopover() {
         const vis = document.getElementById(this.props.toToggle).style.visibility;
+        const popover = document.getElementById(this.props.toToggle);
 
-        document.getElementById(this.props.toToggle).style.visibility = ((vis === "hidden" || vis === "") ? "visible" : "hidden");
+        popover.style.visibility = ((vis === "hidden" || vis === "") ? "visible" : "hidden");
+        popover.style.opacity = ((vis === "hidden" || vis === "") ? "1": "0");
+        popover.style.right =  ((vis === "hidden" || vis === "") ? "0": "-33%");
     }
 
 
