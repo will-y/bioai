@@ -20,7 +20,7 @@ class PopoverToggle extends React.Component {
     render() {
         return (
             <button onClick={this.togglePopover} className={this.props.buttonClass}>
-                Toggle Popover {this.props.toToggle}
+                {this.props.text}
             </button>
         );
     }

@@ -1,8 +1,6 @@
 import React from "react";
 import './Home.css';
 import {Link} from "react-router-dom";
-import Popover from "../common/Popover";
-import PopoverToggle from "../common/PopoverToggle";
 
 class Home extends React.Component {
     render() {
@@ -46,10 +44,6 @@ class Home extends React.Component {
                         </Link>
                     </div>
                 </div>
-                <Popover popoverId="popover-test">
-                    Test
-                </Popover>
-                <PopoverToggle toToggle="popover-test" buttonClass=""/>
             </div>
         );
     }

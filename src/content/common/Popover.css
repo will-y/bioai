@@ -9,3 +9,8 @@
     opacity: 0;
     transition: visibility 1s, opacity 1s, right 1s;
 }
+
+.info-button {
+    border-radius: 50%;
+    width: 2em;
+}

@@ -1,6 +1,9 @@
 import React from 'react';
 import './CA.css';
 import '../Page.css';
+import Popover from "../common/Popover";
+import CAPopover from "../common/CAPopover";
+import PopoverToggle from "../common/PopoverToggle";
 
 const squareSize = 25;
 const cellsPerRow = 50;
@@ -236,9 +239,13 @@ class CA extends React.Component {
                          name="randomizeStartState"
                          checked={this.state.randomizeStartState}
                          onChange={this.handleInputChange} />
+                  <PopoverToggle text="Info" toToggle="ca-popover"/>
                   <br />
                   <canvas id="simulation" width="1500px" height="675px" ref={this.simRef}/>
               </div>
+              <Popover popoverId="ca-popover">
+                  <CAPopover />
+              </Popover>
           </div>
         );
     }
