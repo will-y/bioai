@@ -6,6 +6,9 @@ const gridCount = 50;
 const gridSize = 13;
 const fillProbability = 0.35;
 const neighborArray = [-1, 0, 1];
+const liveColor = "#5beb42";
+const deadColor = "#D8D4F2";
+const borderColor = '#4361A1';
 
 class GameOfLife extends React.Component {
     constructor(props) {
@@ -88,13 +91,13 @@ class GameOfLife extends React.Component {
         for (let i = 0; i < gridCount; i++) {
             for (let j = 0; j < gridCount; j++) {
                 if (this.gameState[i][j] === 1) {
-                    this.ctx.fillStyle = 'green';
+                    this.ctx.fillStyle = liveColor;
                 } else {
-                    this.ctx.fillStyle = 'black';
+                    this.ctx.fillStyle = deadColor;
                 }
                 this.ctx.fillRect(i * gridSize, j * gridSize, gridSize, gridSize);
                 this.ctx.beginPath();
-                this.ctx.strokeStyle = 'white';
+                this.ctx.strokeStyle = borderColor;
                 this.ctx.rect(i * gridSize, j * gridSize, gridSize, gridSize);
                 this.ctx.stroke();
             }
@@ -110,7 +113,7 @@ class GameOfLife extends React.Component {
               <button id="step-game-of-life" onClick={this.step}>Step</button>
               <button id="stop-game-of-life" onClick={() => clearInterval(this.interval)}>Stop</button>
               <br />
-              <canvas id="game-of-life-canvas" width="1000px" height="800px" ref={this.canvasRef}/>
+              <canvas id="game-of-life-canvas" width={gridCount* gridSize} height={gridCount* gridSize} ref={this.canvasRef}/>
           </div>
         );
     }

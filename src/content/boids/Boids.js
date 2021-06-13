@@ -7,6 +7,10 @@ const width = 1000;
 const height = 800;
 let boids = [];
 
+const boidColor = '#5beb42';
+const predatorColor = 'red';
+const attractorColor = '#4361A1';
+
 class Boids extends React.Component {
     constructor(props) {
         super(props);
@@ -107,7 +111,7 @@ class Boids extends React.Component {
 
     drawBoids() {
         this.ctx.clearRect(0, 0, width, height);
-        this.ctx.fillStyle = '#00ff1d';
+        this.ctx.fillStyle = boidColor;
         for (let i = 0; i < numBoids; i++) {
             const boid = boids[i];
             this.ctx.beginPath();
@@ -115,7 +119,7 @@ class Boids extends React.Component {
             this.ctx.fill();
         }
 
-        this.ctx.fillStyle = 'blue';
+        this.ctx.fillStyle = attractorColor;
         if (this.attractorX !== -1) {
             this.ctx.beginPath();
             this.ctx.arc(this.attractorX, this.attractorY, this.state.boidRadius * 2, 0, Math.PI * 2);
@@ -124,7 +128,7 @@ class Boids extends React.Component {
 
         // predator
         if (this.state.predator) {
-            this.ctx.fillStyle = 'red';
+            this.ctx.fillStyle = predatorColor;
             if (this.rx !== -1) {
                 this.ctx.beginPath();
                 this.ctx.arc(this.rx, this.ry, this.state.boidRadius, 0, Math.PI * 2);

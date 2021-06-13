@@ -12,7 +12,7 @@
 }
 
 .contact {
-    background-color: #404f6d;
+    background-color: #4361A1;
     min-height: 250px;
     min-width: 250px;
     display: flex;
@@ -21,9 +21,9 @@
     justify-content: center;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     border-radius: 50px;
-    border: 1px solid #404f6d;
+    border: 1px solid #4361A1;
     transition: transform 250ms ease 0s;
-    color: white;
+    color: #D8D4F2;
     text-decoration: none;
 }
 
@@ -31,7 +31,7 @@
     transform: scale(1.05);
     transition: transform 200ms ease 0s;
     text-decoration: none;
-    color: white;
+    color: #5beb42;
 }
 
 .contact-text {

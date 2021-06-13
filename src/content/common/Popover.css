@@ -4,10 +4,12 @@
     right: -33%;
     height: 100%;
     width: 33%;
-    background-color: blue;
+    background-color: #588157;
     visibility: hidden;
     opacity: 0;
     transition: visibility 1s, opacity 1s, right 1s;
+    padding: 20px;
+    color: #D8D4F2;
 }
 
 .info-button {

@@ -2,7 +2,7 @@
     width: 100%;
     height: auto;
     min-height: 50px;
-    background-color: #3d485e;
+    background-color: #4361A1;
     position: fixed;
     top: 0;
 }
@@ -16,23 +16,23 @@
 }
 
 .nav-component {
-    color: white;
+    color: #D8D4F2;
     padding-left: 20px;
     padding-right: 20px;
     display: flex;
     align-items: center;
     height: 100%;
     text-decoration: none;
-    border-bottom: 2px solid #3d485e;
+    border-bottom: 2px solid #4361A1;
     min-height: 50px;
 }
 
 .nav-component:hover {
-    color: #4183ff;
+    color: #5beb42;
     text-decoration: none;
 }
 
 .nav-component-active {
-    color: #4183ff;
-    border-bottom: 2px solid #4183ff;
+    color: #5beb42;
+    border-bottom: 2px solid #5beb42;
 }

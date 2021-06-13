@@ -1,6 +1,9 @@
 // Original JavaScript code by Chirp Internet: chirpinternet.eu
 // Please acknowledge use of this code by including this header.
 // Adapted to use cellular autonoma to find the shortest path
+const wallColor = '#4361A1';
+const pathColor = '#D8D4F2';
+const startColor = '#5beb42';
 
 class MazeBuilder {
 
@@ -157,11 +160,11 @@ class MazeBuilder {
         for (let i = 0; i < size; i++) {
             for (let j = 0; j < size; j++) {
                 if (array[i][j] === 0) {
-                    ctx.fillStyle = 'white'
+                    ctx.fillStyle = pathColor;
                 } else if (array[i][j] === 1) {
-                    ctx.fillStyle = 'grey'
+                    ctx.fillStyle = wallColor;
                 } else if (array[i][j] === 2) {
-                    ctx.fillStyle = 'purple'
+                    ctx.fillStyle = startColor;
                 }
                 ctx.fillRect(i * drawSize, j * drawSize, drawSize, drawSize)
             }

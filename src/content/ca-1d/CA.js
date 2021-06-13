@@ -8,6 +8,9 @@ import PopoverToggle from "../common/PopoverToggle";
 const squareSize = 25;
 const cellsPerRow = 50;
 const maxRows = 27;
+const liveColor = "#5beb42";
+const deadColor = "#D8D4F2";
+const borderColor = '#4361A1';
 
 class CA extends React.Component {
     constructor(props) {
@@ -116,14 +119,14 @@ class CA extends React.Component {
             if (index >= startIndex) {
                 for (let i = 0; i < rowArray.length; i++) {
                     if (rowArray[i] === 1) {
-                        t.simCtx.fillStyle = 'green';
+                        t.simCtx.fillStyle = liveColor;
                     } else {
-                        t.simCtx.fillStyle = 'white';
+                        t.simCtx.fillStyle = deadColor;
                     }
 
                     t.simCtx.fillRect(i * squareSize, row * squareSize, squareSize, squareSize);
                     t.simCtx.beginPath();
-                    t.simCtx.strokeStyle = 'black';
+                    t.simCtx.strokeStyle = borderColor;
                     t.simCtx.rect(i * squareSize, row * squareSize, squareSize, squareSize);
                     t.simCtx.stroke();
                 }
@@ -171,27 +174,27 @@ class CA extends React.Component {
         for (let i = 0; i < 3; i++) {
             // draw square, colored if binary[i] == 1
             if (binary[i] === 1) {
-                this.wolframCtx.fillStyle = 'green';
+                this.wolframCtx.fillStyle = liveColor;
             } else {
-                this.wolframCtx.fillStyle = 'white';
+                this.wolframCtx.fillStyle = deadColor;
             }
 
             this.wolframCtx.fillRect(x + i * squareSize, y, squareSize, squareSize);
             this.wolframCtx.beginPath();
-            this.wolframCtx.strokeStyle = 'black';
+            this.wolframCtx.strokeStyle = borderColor;
             this.wolframCtx.rect(x + i * squareSize, y, squareSize, squareSize);
             this.wolframCtx.stroke();
         }
 
         if (patternNumber[number] === 1) {
-            this.wolframCtx.fillStyle = 'green';
+            this.wolframCtx.fillStyle = liveColor;
         } else {
-            this.wolframCtx.fillStyle = 'white';
+            this.wolframCtx.fillStyle = deadColor;
         }
 
         this.wolframCtx.fillRect(x + squareSize, y + squareSize + 10    , squareSize, squareSize);
         this.wolframCtx.beginPath();
-        this.wolframCtx.strokeStyle = 'black';
+        this.wolframCtx.strokeStyle = borderColor;
         this.wolframCtx.rect(x + squareSize, y + squareSize + 10, squareSize, squareSize);
         this.wolframCtx.stroke();
 

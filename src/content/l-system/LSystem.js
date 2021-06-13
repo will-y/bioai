@@ -4,6 +4,7 @@ import './LSystem.css';
 
 const width = window.innerWidth * 3 / 4;
 const height = window.innerHeight * 5 / 6;
+const drawColor = '#5beb42';
 
 class LSystem extends React.Component {
     constructor(props) {
@@ -52,8 +53,6 @@ class LSystem extends React.Component {
             }, () => {
                 this.drawString(this.savedString);
             });
-        } else {
-            console.log("???");
         }
     }
 
@@ -141,9 +140,9 @@ class LSystem extends React.Component {
         let currentAngle = Math.PI / 2;
         const branches = [];
 
-        this.ctx.fillStyle = 'black';
         this.ctx.clearRect(0, 0, this.state.width, this.state.height);
         this.ctx.beginPath();
+        this.ctx.strokeStyle = drawColor;
         this.ctx.moveTo(x, y);
 
         for (let i = 0; i < toDraw.length; i++) {
