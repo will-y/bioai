@@ -16,3 +16,12 @@
     border-radius: 50%;
     width: 2em;
 }
+
+.popover-container a {
+    color: #4361A1;
+    text-decoration: underline;
+}
+
+.close-popover {
+    cursor: pointer;
+}

@@ -16,7 +16,6 @@ class PopoverToggle extends React.Component {
         popover.style.right =  ((vis === "hidden" || vis === "") ? "0": "-33%");
     }
 
-
     render() {
         return (
             <button onClick={this.togglePopover} className={this.props.buttonClass}>
