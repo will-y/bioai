@@ -19,6 +19,7 @@ class GameOfLifePopover extends React.Component {
                     <li>Click the Create Random State button to generate a random set of alive and dead cells.</li>
                     <li>Press Start to start the simulation. Press again to pause.</li>
                     <li>Press Step to go forward one step.</li>
+                    <li>Press Reset to clear the board.</li>
                 </ol>
                 <p>You can also click on any square in the simulation at any time to toggle its state.</p>
                 <h3>Cool Patterns</h3>

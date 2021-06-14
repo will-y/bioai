@@ -17,7 +17,7 @@ class GameOfLife extends React.Component {
     constructor(props) {
         super(props);
         this.canvasRef = React.createRef();
-        this.gameState = Array.from(Array(gridCount), _ => Array(gridCount).fill(0));
+        this.gameState = this.getInitialState();
         this.interval = 0;
         this.playing = false;
         this.valid = false;
@@ -27,10 +27,26 @@ class GameOfLife extends React.Component {
         this.start = this.start.bind(this);
         this.step = this.step.bind(this);
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
+        this.reset = this.reset.bind(this);
     }
 
     componentDidMount() {
         this.ctx = this.canvasRef.current.getContext("2d");
+        this.displayGrid();
+    }
+
+    getInitialState() {
+        return Array.from(Array(gridCount), _ => Array(gridCount).fill(0));
+    }
+
+    reset() {
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
+        this.playing = false;
+        this.valid = false;
+        document.getElementById('start-game-of-life').textContent = 'Play';
+        this.gameState = this.getInitialState();
         this.displayGrid();
     }
 
@@ -149,6 +165,7 @@ class GameOfLife extends React.Component {
               <button id="randomize" onClick={this.randomize}>Create Random State</button>
               <button id="start-game-of-life" onClick={this.start}>Play</button>
               <button id="step-game-of-life" onClick={this.step}>Step</button>
+              <button onClick={this.reset}>Reset</button>
               <PopoverToggle text="Info" toToggle="gol-popover" />
               <br />
               <canvas id="game-of-life-canvas" width={gridCount* gridSize} height={gridCount* gridSize} ref={this.canvasRef} onMouseDown={this.handleCanvasClick}/>
