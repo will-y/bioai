@@ -2,7 +2,7 @@ import React from 'react';
 import './CA.css';
 import '../Page.css';
 import Popover from "../common/Popover";
-import CAPopover from "../common/CAPopover";
+import CAPopover from "./CAPopover";
 import PopoverToggle from "../common/PopoverToggle";
 
 const squareSize = 25;

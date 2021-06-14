@@ -18,7 +18,7 @@ class Popover extends React.Component {
     render() {
         return (
             <div className="popover-container" id={this.props.popoverId}>
-                <div className="close-popover" onClick={this.toggle}>{"<"}</div>
+                <div className="close-popover" onClick={this.toggle}>{"Close >"}</div>
                 {this.props.children}
             </div>
         );

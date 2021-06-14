@@ -1,6 +1,9 @@
 import React from 'react';
 import './GameOfLife.css';
 import '../Page.css';
+import Popover from "../common/Popover";
+import GameOfLifePopover from "./GameOfLifePopover";
+import PopoverToggle from "../common/PopoverToggle";
 
 const gridCount = 50;
 const gridSize = 13;
@@ -16,18 +19,23 @@ class GameOfLife extends React.Component {
         this.canvasRef = React.createRef();
         this.gameState = Array.from(Array(gridCount), _ => Array(gridCount).fill(0));
         this.interval = 0;
+        this.playing = false;
+        this.valid = false;
 
         // Click Handlers
         this.randomize = this.randomize.bind(this);
         this.start = this.start.bind(this);
         this.step = this.step.bind(this);
+        this.handleCanvasClick = this.handleCanvasClick.bind(this);
     }
 
     componentDidMount() {
         this.ctx = this.canvasRef.current.getContext("2d");
+        this.displayGrid();
     }
 
     randomize() {
+        this.valid = true;
         for (let i = 0; i < gridCount; i++) {
             for (let j = 0; j < gridCount; j++) {
                 if (Math.random() < fillProbability) {
@@ -42,7 +50,19 @@ class GameOfLife extends React.Component {
     }
 
     start() {
-        this.interval = setInterval(this.step, 50);
+        if (!this.valid) {
+            this.randomize();
+        }
+        if (!this.playing) {
+            document.getElementById('start-game-of-life').textContent = 'Pause';
+            this.interval = setInterval(this.step, 50);
+        } else {
+            document.getElementById('start-game-of-life').textContent = 'Play';
+            if (this.interval) {
+                clearInterval(this.interval);
+            }
+        }
+        this.playing = !this.playing;
     }
 
     step() {
@@ -104,16 +124,37 @@ class GameOfLife extends React.Component {
         }
     }
 
+    handleCanvasClick(event) {
+        this.toggleSquare(this.canvasRef.current, event);
+        this.valid = true;
+    }
+
+    toggleSquare(canvas, event) {
+        const rect = canvas.getBoundingClientRect();
+        const canvasX = event.clientX - rect.left;
+        const canvasY = event.clientY - rect.top;
+
+        const x = Math.floor(canvasX / gridSize);
+        const y = Math.floor(canvasY / gridSize);
+
+        const curState = this.gameState[x][y];
+
+        this.gameState[x][y] = (curState + 1) % 2;
+        this.displayGrid();
+    }
 
     render() {
         return (
           <div className={"ca-container"}>
               <button id="randomize" onClick={this.randomize}>Create Random State</button>
-              <button id="start-game-of-life" onClick={this.start}>Start</button>
+              <button id="start-game-of-life" onClick={this.start}>Play</button>
               <button id="step-game-of-life" onClick={this.step}>Step</button>
-              <button id="stop-game-of-life" onClick={() => clearInterval(this.interval)}>Stop</button>
+              <PopoverToggle text="Info" toToggle="gol-popover" />
               <br />
-              <canvas id="game-of-life-canvas" width={gridCount* gridSize} height={gridCount* gridSize} ref={this.canvasRef}/>
+              <canvas id="game-of-life-canvas" width={gridCount* gridSize} height={gridCount* gridSize} ref={this.canvasRef} onMouseDown={this.handleCanvasClick}/>
+              <Popover popoverId="gol-popover">
+                  <GameOfLifePopover />
+              </Popover>
           </div>
         );
     }
