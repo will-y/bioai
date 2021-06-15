@@ -1,1 +1,15 @@
+.controls-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
 
+.controls-container label {
+    margin-bottom: 0;
+    margin-right: 0.25rem;
+    margin-left: 0.5rem;
+}
+
+.controls-container input[type=range] {
+    margin-right: 0.5rem;
+}

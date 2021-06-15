@@ -19,7 +19,8 @@ class CA extends React.Component {
         this.wolframRef = React.createRef();
         this.state = {
             wolframNumber: 0,
-            randomizeStartState: false
+            randomizeStartState: false,
+            speed: 100
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -41,19 +42,32 @@ class CA extends React.Component {
         this.drawWolframPattern();
     }
 
-    handleInputChange(event) {
+    handleInputChange(event, callBack) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
+        if (name === 'speed') {
+            const oldInterval = this.interval;
+            const t = this;
+            this.interval = setInterval(function() {
+                t.stepForward(true);
+            }, 200 - this.state.speed);
+
+            if (oldInterval) {
+                clearInterval(oldInterval);
+            }
+        }
         this.setState({
             [name]: value
-        });
+        }, callBack ? callBack : () => {});
     }
 
     // Click Handlers
-    updateWolframNumber() {
-        this.wolframArray = this.calculateBinaryArray(this.state.wolframNumber);
-        this.drawWolframPattern();
+    updateWolframNumber(event) {
+        this.handleInputChange(event, () => {
+            this.wolframArray = this.calculateBinaryArray(this.state.wolframNumber);
+            this.drawWolframPattern();
+        });
     }
 
     start() {
@@ -71,7 +85,7 @@ class CA extends React.Component {
             let t = this;
             this.interval = setInterval(function() {
                t.stepForward(true);
-            }, 100);
+            }, 200 - this.state.speed);
         }
         this.playing = !this.playing;
     }
@@ -228,22 +242,29 @@ class CA extends React.Component {
                          max="255"
                          name="wolframNumber"
                          value={this.state.wolframNumber}
-                         onChange={this.handleInputChange} />
-                  <button id="select" onClick={this.updateWolframNumber}>Select</button>
+                         onChange={this.updateWolframNumber} />
               </div>
               <div>
-                  <button id="start" onClick={this.start}>Start</button>
-                  <button id="step-back" onClick={this.stepBackward}>{"<"}</button>
-                  <button id="play" onClick={this.play}>Play</button>
-                  <button id="step-forward" onClick={() => this.stepForward(true)}>{">"}</button>
-                  <label htmlFor="randomize-start-state">Randomize?</label>
-                  <input type="checkbox"
-                         id="randomize-start-state"
-                         name="randomizeStartState"
-                         checked={this.state.randomizeStartState}
-                         onChange={this.handleInputChange} />
-                  <PopoverToggle text="Info" toToggle="ca-popover"/>
-                  <br />
+                  <div className="controls-container">
+                      <button id="start" onClick={this.start}>Start</button>
+                      <button id="step-back" onClick={this.stepBackward}>{"<"}</button>
+                      <button id="play" onClick={this.play}>Play</button>
+                      <button id="step-forward" onClick={() => this.stepForward(true)}>{">"}</button>
+                      <label htmlFor="randomize-start-state">Randomize?</label>
+                      <input type="checkbox"
+                             id="randomize-start-state"
+                             name="randomizeStartState"
+                             checked={this.state.randomizeStartState}
+                             onChange={this.handleInputChange} />
+                      <label htmlFor="speed">Speed: </label>
+                      <input type="range"
+                             name="speed"
+                             value={this.state.speed}
+                             onChange={this.handleInputChange}
+                             min={0}
+                             max={200}/>
+                      <PopoverToggle text="Info" toToggle="ca-popover"/>
+                  </div>
                   <canvas id="simulation" width="1500px" height="675px" ref={this.simRef}/>
               </div>
               <Popover popoverId="ca-popover">
