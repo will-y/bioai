@@ -1,6 +1,9 @@
 import React from "react";
 import './Boids.css';
 import '../Page.css';
+import Popover from "../common/Popover";
+import BoidPopover from "./BoidPopover";
+import PopoverToggle from "../common/PopoverToggle";
 
 const numBoids = 100;
 const width = 1000;
@@ -305,11 +308,8 @@ class Boids extends React.Component {
     render() {
         return (
             <div className="ca-container boids-container">
-                <canvas id="boids-canvas"
-                        width="1000px"
-                        height="800px"
-                        ref={this.canvasRef} onMouseDown={this.canvasClickHandler}/>
                 <div className="sliders">
+                    <PopoverToggle toToggle="boids-popover" text="Info" />
                     <button id="start" onClick={this.start}>Start</button>
                     <button id="reset" onClick={this.reset}>Reset</button>
                     <label htmlFor="radius" id="radius-label">Radius: {this.state.boidRadius}</label>
@@ -366,6 +366,13 @@ class Boids extends React.Component {
                                onChange={this.handleInputChange} />
                     </div>
                 </div>
+                <canvas id="boids-canvas"
+                        width="1000px"
+                        height="800px"
+                        ref={this.canvasRef} onMouseDown={this.canvasClickHandler}/>
+                <Popover popoverId="boids-popover">
+                    <BoidPopover />
+                </Popover>
             </div>
         );
     }

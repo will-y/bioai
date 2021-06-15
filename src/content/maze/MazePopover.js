@@ -16,7 +16,7 @@ class MazePopover extends React.Component {
                 <p>This causes all of the dead ends to be "eaten" away and what is left is the solution to the maze.</p>
                 <h3>Maze Generation</h3>
                 <p>I didn't write the maze generation code. The original source is <a href="https://www.the-art-of-web.com/javascript/maze-generator/" target="_blank" rel="noreferrer">here.</a> There is a good article about how it works there. I modified it slightly to draw how I wanted it and to be able to access the data in the way I needed it.</p>
-                <h3>How to use the App</h3>
+                <h3>How to Use the App</h3>
                 <ol>
                     <li>A random maze in generated initially.</li>
                     <li>Press Run Maze Solver to start the solver. Press it again to pause.</li>
