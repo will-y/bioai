@@ -13,14 +13,36 @@ class Maze extends React.Component {
 
         this.reset();
 
+        this.state = {
+            speed: 100
+        }
+
         this.stepMaze = this.stepMaze.bind(this);
         this.start = this.start.bind(this);
         this.reset = this.reset.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
     }
 
     componentDidMount() {
         this.mazeCtx = this.mazeRef.current.getContext("2d");
         this.mazeBuilder.draw(this.mazeCtx);
+    }
+
+    handleInputChange(event) {
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+        if (name === 'speed') {
+            const oldInterval = this.mazeInterval;
+            this.mazeInterval = setInterval(this.stepMaze, 200 - this.state.speed);
+
+            if (oldInterval) {
+                clearInterval(oldInterval);
+            }
+        }
+        this.setState({
+            [name]: value
+        });
     }
 
     reset() {
@@ -45,7 +67,7 @@ class Maze extends React.Component {
             this.active = false;
         } else {
             this.active = true;
-            this.mazeInterval = setInterval(this.stepMaze, 100);
+            this.mazeInterval = setInterval(this.stepMaze, 200 - this.state.speed);
         }
     }
 
@@ -92,11 +114,19 @@ class Maze extends React.Component {
     render() {
         return (
           <div className="ca-container">
-              <button id="start-maze" onClick={this.start}>Run Maze Solver</button>
-              <button id="step-maze" onClick={this.stepMaze}>Step</button>
-              <button id="reset" onClick={this.reset}>Reset</button>
-              <PopoverToggle text="Info" toToggle="maze-popover"/>
-              <br />
+              <div className="controls-container">
+                  <button id="start-maze" onClick={this.start}>Run Maze Solver</button>
+                  <button id="step-maze" onClick={this.stepMaze}>Step</button>
+                  <button id="reset" onClick={this.reset}>Reset</button>
+                  <PopoverToggle text="Info" toToggle="maze-popover"/>
+                  <label htmlFor="speed">Speed: </label>
+                  <input type="range"
+                         name="speed"
+                         value={this.state.speed}
+                         onChange={this.handleInputChange}
+                         min={0}
+                         max={200}/>
+              </div>
               <canvas id="maze-canvas" width="1000px" height="550px" ref={this.mazeRef}/>
               <Popover popoverId="maze-popover">
                 <MazePopover />
