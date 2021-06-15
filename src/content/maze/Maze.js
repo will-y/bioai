@@ -2,6 +2,9 @@ import React from 'react';
 import './Maze.css';
 import '../Page.css';
 import MazeBuilder from './MazeBuilder';
+import Popover from "../common/Popover";
+import MazePopover from "./MazePopover";
+import PopoverToggle from "../common/PopoverToggle";
 
 class Maze extends React.Component {
     constructor(props) {
@@ -92,8 +95,12 @@ class Maze extends React.Component {
               <button id="start-maze" onClick={this.start}>Run Maze Solver</button>
               <button id="step-maze" onClick={this.stepMaze}>Step</button>
               <button id="reset" onClick={this.reset}>Reset</button>
+              <PopoverToggle text="Info" toToggle="maze-popover"/>
               <br />
               <canvas id="maze-canvas" width="1000px" height="550px" ref={this.mazeRef}/>
+              <Popover popoverId="maze-popover">
+                <MazePopover />
+              </Popover>
           </div>
         );
     }
