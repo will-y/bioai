@@ -17,7 +17,7 @@ class GameOfLife extends React.Component {
     constructor(props) {
         super(props);
         this.canvasRef = React.createRef();
-        this.gameState = this.getInitialState();
+        this.gameState = this.getInitialGameState();
         this.interval = 0;
         this.playing = false;
         this.valid = false;
@@ -35,7 +35,7 @@ class GameOfLife extends React.Component {
         this.displayGrid();
     }
 
-    getInitialState() {
+    getInitialGameState() {
         return Array.from(Array(gridCount), _ => Array(gridCount).fill(0));
     }
 
@@ -46,7 +46,7 @@ class GameOfLife extends React.Component {
         this.playing = false;
         this.valid = false;
         document.getElementById('start-game-of-life').textContent = 'Play';
-        this.gameState = this.getInitialState();
+        this.gameState = this.getInitialGameState();
         this.displayGrid();
     }
 

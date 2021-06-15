@@ -10,6 +10,7 @@
     transition: visibility 1s, opacity 1s, right 1s;
     padding: 20px;
     color: #D8D4F2;
+    overflow-y: scroll;
 }
 
 .info-button {
@@ -24,4 +25,8 @@
 
 .close-popover {
     cursor: pointer;
+}
+
+.def {
+
 }

@@ -1,6 +1,9 @@
 import React from 'react';
 import '../Page.css';
 import './LSystem.css';
+import PopoverToggle from "../common/PopoverToggle";
+import Popover from "../common/Popover";
+import LSystemPopover from "./LSystemPopover";
 
 const width = window.innerWidth * 3 / 4;
 const height = window.innerHeight * 5 / 6;
@@ -186,6 +189,7 @@ class LSystem extends React.Component {
             <div className="l-container">
                 <div className="form-container">
                     <div className="rule-container">
+                        <PopoverToggle text="Info" toToggle="lsystem-popover" buttonClass="w-100 mb-2" />
                         <label htmlFor="axiom">Axiom: </label>
                         <input className="rule-input"
                                name="axiom"
@@ -257,6 +261,9 @@ class LSystem extends React.Component {
                 <div className="canvas-wrapper" ref={this.canvasWrapperRef}>
                     <canvas width={this.state.width} height={this.state.height} ref={this.lSystemRef} id="canvas"/>
                 </div>
+                <Popover popoverId="lsystem-popover" >
+                    <LSystemPopover />
+                </Popover>
             </div>
             );
     }
