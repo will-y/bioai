@@ -92,7 +92,11 @@ class CA extends React.Component {
 
     // Other
     stepForward(showGraphics) {
-        const current = this.graphicsArray[this.graphicsArray.length - 1];
+        let current = this.graphicsArray[this.graphicsArray.length - 1];
+        if (!current) {
+            this.initializeArray(this.state.randomizeStartState);
+            current = this.graphicsArray[0];
+        }
         let next = [];
         // wraps around
         for (let i = 0; i < current.length; i++) {
