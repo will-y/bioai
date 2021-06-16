@@ -22,12 +22,37 @@ class GameOfLife extends React.Component {
         this.playing = false;
         this.valid = false;
 
+        this.state = {
+            speed: 100
+        }
+
         // Click Handlers
         this.randomize = this.randomize.bind(this);
         this.start = this.start.bind(this);
         this.step = this.step.bind(this);
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
         this.reset = this.reset.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+    }
+
+    handleInputChange(event) {
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+        if (name === 'speed') {
+            const oldInterval = this.interval;
+            const t = this;
+            this.interval = setInterval(function() {
+                t.step();
+            }, 200 - this.state.speed);
+
+            if (oldInterval) {
+                clearInterval(oldInterval);
+            }
+        }
+        this.setState({
+            [name]: value
+        });
     }
 
     componentDidMount() {
@@ -71,7 +96,7 @@ class GameOfLife extends React.Component {
         }
         if (!this.playing) {
             document.getElementById('start-game-of-life').textContent = 'Pause';
-            this.interval = setInterval(this.step, 50);
+            this.interval = setInterval(this.step, 200 - this.state.speed);
         } else {
             document.getElementById('start-game-of-life').textContent = 'Play';
             if (this.interval) {
@@ -109,8 +134,8 @@ class GameOfLife extends React.Component {
         let count = 0;
         let newX = 0;
         let newY = 0;
-        neighborArray.forEach(function(x) {
-            neighborArray.forEach(function(y) {
+        neighborArray.forEach(function (x) {
+            neighborArray.forEach(function (y) {
                 newX = i + x;
                 newY = j + y;
                 if (newX >= 0 && newY >= 0 && newX <= size - 1 && newY <= size - 1 && !(x === 0 && y === 0)) {
@@ -161,18 +186,27 @@ class GameOfLife extends React.Component {
 
     render() {
         return (
-          <div className={"ca-container"}>
-              <button id="randomize" onClick={this.randomize}>Create Random State</button>
-              <button id="start-game-of-life" onClick={this.start}>Play</button>
-              <button id="step-game-of-life" onClick={this.step}>Step</button>
-              <button onClick={this.reset}>Reset</button>
-              <PopoverToggle text="Info" toToggle="gol-popover" />
-              <br />
-              <canvas id="game-of-life-canvas" width={gridCount* gridSize} height={gridCount* gridSize} ref={this.canvasRef} onMouseDown={this.handleCanvasClick}/>
-              <Popover popoverId="gol-popover">
-                  <GameOfLifePopover />
-              </Popover>
-          </div>
+            <div className={"ca-container"}>
+                <div className="controls-container">
+                    <button id="randomize" onClick={this.randomize}>Create Random State</button>
+                    <button id="start-game-of-life" onClick={this.start}>Play</button>
+                    <button id="step-game-of-life" onClick={this.step}>Step</button>
+                    <button onClick={this.reset}>Reset</button>
+                    <PopoverToggle text="Info" toToggle="gol-popover"/>
+                    <label htmlFor="speed">Speed: </label>
+                    <input type="range"
+                           name="speed"
+                           value={this.state.speed}
+                           onChange={this.handleInputChange}
+                           min={0}
+                           max={200}/>
+                </div>
+                <canvas id="game-of-life-canvas" width={gridCount * gridSize} height={gridCount * gridSize}
+                        ref={this.canvasRef} onMouseDown={this.handleCanvasClick}/>
+                <Popover popoverId="gol-popover">
+                    <GameOfLifePopover/>
+                </Popover>
+            </div>
         );
     }
 }
