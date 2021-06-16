@@ -4,6 +4,7 @@ import '../Page.css';
 import Popover from "../common/Popover";
 import GameOfLifePopover from "./GameOfLifePopover";
 import PopoverToggle from "../common/PopoverToggle";
+import Timer from "../common/Timer";
 
 const gridCount = 50;
 const gridSize = 13;
@@ -18,13 +19,16 @@ class GameOfLife extends React.Component {
         super(props);
         this.canvasRef = React.createRef();
         this.gameState = this.getInitialGameState();
-        this.interval = 0;
-        this.playing = false;
-        this.valid = false;
 
         this.state = {
             speed: 100
         }
+        const t = this;
+        this.timer = new Timer(() => {
+            t.step();
+        }, 200 - this.state.speed);
+        this.playing = false;
+        this.valid = false;
 
         // Click Handlers
         this.randomize = this.randomize.bind(this);
@@ -40,15 +44,7 @@ class GameOfLife extends React.Component {
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
         if (name === 'speed') {
-            const oldInterval = this.interval;
-            const t = this;
-            this.interval = setInterval(function() {
-                t.step();
-            }, 200 - this.state.speed);
-
-            if (oldInterval) {
-                clearInterval(oldInterval);
-            }
+            this.timer.changeTime(200 - value);
         }
         this.setState({
             [name]: value
@@ -65,9 +61,7 @@ class GameOfLife extends React.Component {
     }
 
     reset() {
-        if (this.interval) {
-            clearInterval(this.interval);
-        }
+        this.timer.pause();
         this.playing = false;
         this.valid = false;
         document.getElementById('start-game-of-life').textContent = 'Play';
@@ -96,12 +90,10 @@ class GameOfLife extends React.Component {
         }
         if (!this.playing) {
             document.getElementById('start-game-of-life').textContent = 'Pause';
-            this.interval = setInterval(this.step, 200 - this.state.speed);
+            this.timer.start();
         } else {
             document.getElementById('start-game-of-life').textContent = 'Play';
-            if (this.interval) {
-                clearInterval(this.interval);
-            }
+            this.timer.pause();
         }
         this.playing = !this.playing;
     }

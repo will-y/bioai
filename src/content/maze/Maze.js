@@ -5,13 +5,12 @@ import MazeBuilder from './MazeBuilder';
 import Popover from "../common/Popover";
 import MazePopover from "./MazePopover";
 import PopoverToggle from "../common/PopoverToggle";
+import Timer from "../common/Timer";
 
 class Maze extends React.Component {
     constructor(props) {
         super(props);
         this.mazeRef = React.createRef();
-
-        this.reset();
 
         this.state = {
             speed: 100
@@ -21,6 +20,10 @@ class Maze extends React.Component {
         this.start = this.start.bind(this);
         this.reset = this.reset.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
+
+        this.timer = new Timer(this.stepMaze, 200 - this.state.speed);
+        this.reset();
+
     }
 
     componentDidMount() {
@@ -33,12 +36,7 @@ class Maze extends React.Component {
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
         if (name === 'speed') {
-            const oldInterval = this.mazeInterval;
-            this.mazeInterval = setInterval(this.stepMaze, 200 - this.state.speed);
-
-            if (oldInterval) {
-                clearInterval(oldInterval);
-            }
+            this.timer.changeTime(200 - value);
         }
         this.setState({
             [name]: value
@@ -50,10 +48,7 @@ class Maze extends React.Component {
         this.mazeBuilder = new MazeBuilder(this.size / 2, this.size / 2);
         this.size++;
         this.maze = this.mazeBuilder.maze;
-        if (this.mazeInterval) {
-            clearInterval(this.mazeInterval);
-        }
-        this.mazeInterval = 0;
+        this.timer.pause();
         this.active = false;
 
         if (this.mazeCtx) {
@@ -62,12 +57,12 @@ class Maze extends React.Component {
     }
 
     start() {
-        if (this.active && this.mazeInterval) {
-            clearInterval(this.mazeInterval);
+        if (this.active) {
+            this.timer.pause();
             this.active = false;
         } else {
             this.active = true;
-            this.mazeInterval = setInterval(this.stepMaze, 200 - this.state.speed);
+            this.timer.start();
         }
     }
 
