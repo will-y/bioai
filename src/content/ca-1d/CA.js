@@ -4,6 +4,7 @@ import '../Page.css';
 import Popover from "../common/Popover";
 import CAPopover from "./CAPopover";
 import PopoverToggle from "../common/PopoverToggle";
+import {changeTime, startTimer, stopTimer} from "../common/Timer";
 
 const squareSize = 25;
 const cellsPerRow = 50;
@@ -33,7 +34,7 @@ class CA extends React.Component {
         this.wolframArray = [0, 0, 0, 0, 0, 0, 0, 0];
         this.graphicsArray = [];
         this.playing = false;
-        this.interval = 0;
+        this.interval = -1;
     }
 
     componentDidMount() {
@@ -42,24 +43,18 @@ class CA extends React.Component {
         this.drawWolframPattern();
     }
 
-    handleInputChange(event, callBack) {
+    handleInputChange(event, callback) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
-        if (name === 'speed') {
-            const oldInterval = this.interval;
-            const t = this;
-            this.interval = setInterval(function() {
-                t.stepForward(true);
-            }, 200 - this.state.speed);
 
-            if (oldInterval) {
-                clearInterval(oldInterval);
-            }
+        if (name === 'speed') {
+            changeTime(this.interval, 200 - value);
         }
+
         this.setState({
             [name]: value
-        }, callBack ? callBack : () => {});
+        }, callback);
     }
 
     // Click Handlers
@@ -78,14 +73,14 @@ class CA extends React.Component {
 
     play() {
         if (this.playing) {
-            clearInterval(this.interval);
+            stopTimer(this.interval);
             document.getElementById('play').textContent = 'Play';
         } else {
             document.getElementById('play').textContent = 'Pause';
             let t = this;
-            this.interval = setInterval(function() {
-               t.stepForward(true);
-            }, 200 - this.state.speed);
+            this.interval = startTimer(() => {
+                t.stepForward(true);
+            }, 2000);
         }
         this.playing = !this.playing;
     }
