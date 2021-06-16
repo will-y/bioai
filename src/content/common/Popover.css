@@ -13,6 +13,18 @@
     overflow-y: auto;
 }
 
+@media only screen and (max-width: 1000px) {
+    .popover-container {
+        width: 50%;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .popover-container {
+        width: 100%;
+    }
+}
+
 .info-button {
     border-radius: 50%;
     width: 2em;
