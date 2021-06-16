@@ -4,7 +4,7 @@ import '../Page.css';
 import Popover from "../common/Popover";
 import CAPopover from "./CAPopover";
 import PopoverToggle from "../common/PopoverToggle";
-import {changeTime, startTimer, stopTimer} from "../common/Timer";
+import Timer from "../common/Timer";
 
 const squareSize = 25;
 const cellsPerRow = 50;
@@ -34,7 +34,10 @@ class CA extends React.Component {
         this.wolframArray = [0, 0, 0, 0, 0, 0, 0, 0];
         this.graphicsArray = [];
         this.playing = false;
-        this.interval = -1;
+        const t = this;
+        this.timer = new Timer(() => {
+            t.stepForward(true);
+        }, 100);
     }
 
     componentDidMount() {
@@ -49,7 +52,7 @@ class CA extends React.Component {
         const name = target.name;
 
         if (name === 'speed') {
-            changeTime(this.interval, 200 - value);
+            this.timer.changeTime(200 - value);
         }
 
         this.setState({
@@ -73,14 +76,11 @@ class CA extends React.Component {
 
     play() {
         if (this.playing) {
-            stopTimer(this.interval);
+            this.timer.pause();
             document.getElementById('play').textContent = 'Play';
         } else {
             document.getElementById('play').textContent = 'Pause';
-            let t = this;
-            this.interval = startTimer(() => {
-                t.stepForward(true);
-            }, 2000);
+            this.timer.start();
         }
         this.playing = !this.playing;
     }

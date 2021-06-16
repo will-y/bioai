@@ -1,32 +1,30 @@
-const timers = [];
-let curId = 0;
+class Timer {
+    constructor(fun, initialTime) {
+        this.fun = fun;
+        this.time = initialTime;
+        this.active = false;
+    }
 
-export function startTimer(fun, initialTime) {
-    timers.push({
-        active: true,
-        time: initialTime
-    });
+    start () {
+        this.active = true;
+        this.tick(this);
+    }
 
-    const id = curId++;
+    // need the t here to pass through the this context
+    tick(t) {
+        if (t.active) {
+            t.fun();
+            setTimeout(t.tick, t.time, t);
+        }
+    }
 
-    tick(id, fun);
+    changeTime(newTime) {
+        this.time = newTime;
+    }
 
-    return id;
-}
-
-function tick(id, fun) {
-    if (timers[id].active) {
-        fun();
-        setTimeout(tick, timers[id].time, id, fun);
+    pause() {
+        this.active = false;
     }
 }
 
-export function changeTime(id, time) {
-    timers[id].time = time;
-}
-
-export function stopTimer(id) {
-    if (id < curId && id !== -1) {
-        timers[id].active = false;
-    }
-}
+export default Timer;
