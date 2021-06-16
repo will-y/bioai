@@ -14,7 +14,7 @@ class CAPopover extends React.Component {
                     <li>Clicking the start button will add an initial row to the start. If the randomize option is selected, it will create a random row, if it is off, only the center square will be alive.</li>
                     <li>Click play to start the simulation playing.</li>
                     <li>The arrows can be used to step the simulation one step forward or backward.</li>
-                    <li>The speed slider determines how fast the simulation goes, the further to the right, the faster it will go. Note: it pauses when slowing it down, it will start at the new speed when the slider has stopped moving.</li>
+                    <li>The speed slider determines how fast the simulation goes, the further to the right, the faster it will go.</li>
                 </ol>
                 <h3>Cool Transition Rules</h3>
                 <ul>
