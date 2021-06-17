@@ -33,7 +33,7 @@
 }
 
 .nav-bar-stacked {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     min-height: 50px;
@@ -60,6 +60,10 @@
 @media only screen and (max-width: 600px) {
     .nav-bar-inline {
         display: none;
+    }
+
+    .nav-bar-stacked {
+        display: flex;
     }
 
     .nav-toggle {
