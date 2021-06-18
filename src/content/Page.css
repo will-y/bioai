@@ -1,10 +1,9 @@
 .page {
-    min-height: 88vh;
 }
 
 .page-content {
-    min-height: 88vh;
-    margin-top: 6vh;
+    min-height: calc(100vh - 50px);
+    margin-top: 50px;
 }
 
 .ca-container {
