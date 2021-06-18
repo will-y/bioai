@@ -7,7 +7,8 @@ class NavComponent extends React.Component {
 
     render() {
         return (
-            <Link className={"nav-component" + (this.props.active ? " nav-component-active" : "")} to={this.props.path}>
+            <Link className={"nav-component" + (this.props.active ? " nav-component-active " : " ") + this.props.classes}
+                  to={this.props.path}>
                 {this.props.title}
             </Link>
         );

@@ -4,6 +4,7 @@ import '../Page.css';
 import Popover from "../common/Popover";
 import CAPopover from "./CAPopover";
 import PopoverToggle from "../common/PopoverToggle";
+import Timer from "../common/Timer";
 
 const squareSize = 25;
 const cellsPerRow = 50;
@@ -19,7 +20,8 @@ class CA extends React.Component {
         this.wolframRef = React.createRef();
         this.state = {
             wolframNumber: 0,
-            randomizeStartState: false
+            randomizeStartState: false,
+            speed: 100
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -32,7 +34,10 @@ class CA extends React.Component {
         this.wolframArray = [0, 0, 0, 0, 0, 0, 0, 0];
         this.graphicsArray = [];
         this.playing = false;
-        this.interval = 0;
+        const t = this;
+        this.timer = new Timer(() => {
+            t.stepForward(true);
+        }, 100);
     }
 
     componentDidMount() {
@@ -41,19 +46,26 @@ class CA extends React.Component {
         this.drawWolframPattern();
     }
 
-    handleInputChange(event) {
+    handleInputChange(event, callback) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
+
+        if (name === 'speed') {
+            this.timer.changeTime(200 - value);
+        }
+
         this.setState({
             [name]: value
-        });
+        }, callback);
     }
 
     // Click Handlers
-    updateWolframNumber() {
-        this.wolframArray = this.calculateBinaryArray(this.state.wolframNumber);
-        this.drawWolframPattern();
+    updateWolframNumber(event) {
+        this.handleInputChange(event, () => {
+            this.wolframArray = this.calculateBinaryArray(this.state.wolframNumber);
+            this.drawWolframPattern();
+        });
     }
 
     start() {
@@ -64,21 +76,22 @@ class CA extends React.Component {
 
     play() {
         if (this.playing) {
-            clearInterval(this.interval);
+            this.timer.pause();
             document.getElementById('play').textContent = 'Play';
         } else {
             document.getElementById('play').textContent = 'Pause';
-            let t = this;
-            this.interval = setInterval(function() {
-               t.stepForward(true);
-            }, 100);
+            this.timer.start();
         }
         this.playing = !this.playing;
     }
 
     // Other
     stepForward(showGraphics) {
-        const current = this.graphicsArray[this.graphicsArray.length - 1];
+        let current = this.graphicsArray[this.graphicsArray.length - 1];
+        if (!current) {
+            this.initializeArray(this.state.randomizeStartState);
+            current = this.graphicsArray[0];
+        }
         let next = [];
         // wraps around
         for (let i = 0; i < current.length; i++) {
@@ -228,22 +241,29 @@ class CA extends React.Component {
                          max="255"
                          name="wolframNumber"
                          value={this.state.wolframNumber}
-                         onChange={this.handleInputChange} />
-                  <button id="select" onClick={this.updateWolframNumber}>Select</button>
+                         onChange={this.updateWolframNumber} />
               </div>
               <div>
-                  <button id="start" onClick={this.start}>Start</button>
-                  <button id="step-back" onClick={this.stepBackward}>{"<"}</button>
-                  <button id="play" onClick={this.play}>Play</button>
-                  <button id="step-forward" onClick={() => this.stepForward(true)}>{">"}</button>
-                  <label htmlFor="randomize-start-state">Randomize?</label>
-                  <input type="checkbox"
-                         id="randomize-start-state"
-                         name="randomizeStartState"
-                         checked={this.state.randomizeStartState}
-                         onChange={this.handleInputChange} />
-                  <PopoverToggle text="Info" toToggle="ca-popover"/>
-                  <br />
+                  <div className="controls-container">
+                      <button id="start" onClick={this.start}>Start</button>
+                      <button id="step-back" onClick={this.stepBackward}>{"<"}</button>
+                      <button id="play" onClick={this.play}>Play</button>
+                      <button id="step-forward" onClick={() => this.stepForward(true)}>{">"}</button>
+                      <label htmlFor="randomize-start-state">Randomize?</label>
+                      <input type="checkbox"
+                             id="randomize-start-state"
+                             name="randomizeStartState"
+                             checked={this.state.randomizeStartState}
+                             onChange={this.handleInputChange} />
+                      <label htmlFor="speed">Speed: </label>
+                      <input type="range"
+                             name="speed"
+                             value={this.state.speed}
+                             onChange={this.handleInputChange}
+                             min={0}
+                             max={200}/>
+                      <PopoverToggle text="Info" toToggle="ca-popover"/>
+                  </div>
                   <canvas id="simulation" width="1500px" height="675px" ref={this.simRef}/>
               </div>
               <Popover popoverId="ca-popover">

@@ -5,17 +5,25 @@ import MazeBuilder from './MazeBuilder';
 import Popover from "../common/Popover";
 import MazePopover from "./MazePopover";
 import PopoverToggle from "../common/PopoverToggle";
+import Timer from "../common/Timer";
 
 class Maze extends React.Component {
     constructor(props) {
         super(props);
         this.mazeRef = React.createRef();
 
-        this.reset();
+        this.state = {
+            speed: 100
+        }
 
         this.stepMaze = this.stepMaze.bind(this);
         this.start = this.start.bind(this);
         this.reset = this.reset.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+
+        this.timer = new Timer(this.stepMaze, 200 - this.state.speed);
+        this.reset();
+
     }
 
     componentDidMount() {
@@ -23,15 +31,24 @@ class Maze extends React.Component {
         this.mazeBuilder.draw(this.mazeCtx);
     }
 
+    handleInputChange(event) {
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+        if (name === 'speed') {
+            this.timer.changeTime(200 - value);
+        }
+        this.setState({
+            [name]: value
+        });
+    }
+
     reset() {
         this.size = 50;
         this.mazeBuilder = new MazeBuilder(this.size / 2, this.size / 2);
         this.size++;
         this.maze = this.mazeBuilder.maze;
-        if (this.mazeInterval) {
-            clearInterval(this.mazeInterval);
-        }
-        this.mazeInterval = 0;
+        this.timer.pause();
         this.active = false;
 
         if (this.mazeCtx) {
@@ -40,12 +57,12 @@ class Maze extends React.Component {
     }
 
     start() {
-        if (this.active && this.mazeInterval) {
-            clearInterval(this.mazeInterval);
+        if (this.active) {
+            this.timer.pause();
             this.active = false;
         } else {
             this.active = true;
-            this.mazeInterval = setInterval(this.stepMaze, 100);
+            this.timer.start();
         }
     }
 
@@ -92,11 +109,19 @@ class Maze extends React.Component {
     render() {
         return (
           <div className="ca-container">
-              <button id="start-maze" onClick={this.start}>Run Maze Solver</button>
-              <button id="step-maze" onClick={this.stepMaze}>Step</button>
-              <button id="reset" onClick={this.reset}>Reset</button>
-              <PopoverToggle text="Info" toToggle="maze-popover"/>
-              <br />
+              <div className="controls-container">
+                  <button id="start-maze" onClick={this.start}>Run Maze Solver</button>
+                  <button id="step-maze" onClick={this.stepMaze}>Step</button>
+                  <button id="reset" onClick={this.reset}>Reset</button>
+                  <PopoverToggle text="Info" toToggle="maze-popover"/>
+                  <label htmlFor="speed">Speed: </label>
+                  <input type="range"
+                         name="speed"
+                         value={this.state.speed}
+                         onChange={this.handleInputChange}
+                         min={0}
+                         max={200}/>
+              </div>
               <canvas id="maze-canvas" width="1000px" height="550px" ref={this.mazeRef}/>
               <Popover popoverId="maze-popover">
                 <MazePopover />

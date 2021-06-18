@@ -22,6 +22,7 @@ class MazePopover extends React.Component {
                     <li>Press Run Maze Solver to start the solver. Press it again to pause.</li>
                     <li>At any point, press the Step button to advance the solver one step.</li>
                     <li>To generate a new maze, press the Reset button.</li>
+                    <li>Control the speed of the simulation with the speed slider.</li>
                 </ol>
             </div>
         );

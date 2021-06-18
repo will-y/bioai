@@ -4,6 +4,7 @@ import '../Page.css';
 import Popover from "../common/Popover";
 import GameOfLifePopover from "./GameOfLifePopover";
 import PopoverToggle from "../common/PopoverToggle";
+import Timer from "../common/Timer";
 
 const gridCount = 50;
 const gridSize = 13;
@@ -18,7 +19,14 @@ class GameOfLife extends React.Component {
         super(props);
         this.canvasRef = React.createRef();
         this.gameState = this.getInitialGameState();
-        this.interval = 0;
+
+        this.state = {
+            speed: 100
+        }
+        const t = this;
+        this.timer = new Timer(() => {
+            t.step();
+        }, 200 - this.state.speed);
         this.playing = false;
         this.valid = false;
 
@@ -28,6 +36,19 @@ class GameOfLife extends React.Component {
         this.step = this.step.bind(this);
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
         this.reset = this.reset.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+    }
+
+    handleInputChange(event) {
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+        if (name === 'speed') {
+            this.timer.changeTime(200 - value);
+        }
+        this.setState({
+            [name]: value
+        });
     }
 
     componentDidMount() {
@@ -40,9 +61,7 @@ class GameOfLife extends React.Component {
     }
 
     reset() {
-        if (this.interval) {
-            clearInterval(this.interval);
-        }
+        this.timer.pause();
         this.playing = false;
         this.valid = false;
         document.getElementById('start-game-of-life').textContent = 'Play';
@@ -71,12 +90,10 @@ class GameOfLife extends React.Component {
         }
         if (!this.playing) {
             document.getElementById('start-game-of-life').textContent = 'Pause';
-            this.interval = setInterval(this.step, 50);
+            this.timer.start();
         } else {
             document.getElementById('start-game-of-life').textContent = 'Play';
-            if (this.interval) {
-                clearInterval(this.interval);
-            }
+            this.timer.pause();
         }
         this.playing = !this.playing;
     }
@@ -109,8 +126,8 @@ class GameOfLife extends React.Component {
         let count = 0;
         let newX = 0;
         let newY = 0;
-        neighborArray.forEach(function(x) {
-            neighborArray.forEach(function(y) {
+        neighborArray.forEach(function (x) {
+            neighborArray.forEach(function (y) {
                 newX = i + x;
                 newY = j + y;
                 if (newX >= 0 && newY >= 0 && newX <= size - 1 && newY <= size - 1 && !(x === 0 && y === 0)) {
@@ -161,18 +178,27 @@ class GameOfLife extends React.Component {
 
     render() {
         return (
-          <div className={"ca-container"}>
-              <button id="randomize" onClick={this.randomize}>Create Random State</button>
-              <button id="start-game-of-life" onClick={this.start}>Play</button>
-              <button id="step-game-of-life" onClick={this.step}>Step</button>
-              <button onClick={this.reset}>Reset</button>
-              <PopoverToggle text="Info" toToggle="gol-popover" />
-              <br />
-              <canvas id="game-of-life-canvas" width={gridCount* gridSize} height={gridCount* gridSize} ref={this.canvasRef} onMouseDown={this.handleCanvasClick}/>
-              <Popover popoverId="gol-popover">
-                  <GameOfLifePopover />
-              </Popover>
-          </div>
+            <div className={"ca-container"}>
+                <div className="controls-container">
+                    <button id="randomize" onClick={this.randomize}>Create Random State</button>
+                    <button id="start-game-of-life" onClick={this.start}>Play</button>
+                    <button id="step-game-of-life" onClick={this.step}>Step</button>
+                    <button onClick={this.reset}>Reset</button>
+                    <PopoverToggle text="Info" toToggle="gol-popover"/>
+                    <label htmlFor="speed">Speed: </label>
+                    <input type="range"
+                           name="speed"
+                           value={this.state.speed}
+                           onChange={this.handleInputChange}
+                           min={0}
+                           max={200}/>
+                </div>
+                <canvas id="game-of-life-canvas" width={gridCount * gridSize} height={gridCount * gridSize}
+                        ref={this.canvasRef} onMouseDown={this.handleCanvasClick}/>
+                <Popover popoverId="gol-popover">
+                    <GameOfLifePopover/>
+                </Popover>
+            </div>
         );
     }
 }
