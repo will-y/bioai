@@ -10,13 +10,13 @@ class NeuralNetwork extends React.Component {
         this.state = {
             nn: {
                 nodes: [
-                    {x: 100, y: 100, id: 0, input: true},
-                    {x: 100, y: 200, id: 1, input: true},
-                    {x: 200, y: 150, id: 2, output: true}
+                    {x: 100, y: 100, id: 0, input: true, color: "purple"},
+                    {x: 100, y: 200, id: 1, input: true, color: "purple"},
+                    {x: 200, y: 150, id: 2, output: true, color: "green"}
                 ],
                 edges: [
-                    {n1: 0, n2: 2, w: 1},
-                    {n1: 1, n2: 2, w: 0.5}
+                    {n1: 0, n2: 2, w: 1, color: "orange"},
+                    {n1: 1, n2: 2, w: 0.5, color: "orange"}
                 ]
             },
             width: 500,
@@ -117,7 +117,7 @@ class NeuralNetwork extends React.Component {
             const n2 = nodes[edge.n2];
 
             this.ctx.beginPath();
-            this.ctx.strokeStyle = 'orange';
+            this.ctx.strokeStyle = edge.color;
             this.ctx.lineWidth = edge.w * 5;
             console.log(edge);
             this.ctx.moveTo(n1.x, n1.y);
@@ -130,7 +130,7 @@ class NeuralNetwork extends React.Component {
             const node = nodes[i];
 
             this.ctx.beginPath();
-            this.ctx.fillStyle = 'purple';
+            this.ctx.fillStyle = node.color;
             this.ctx.arc(node.x, node.y, node_radius, 0, Math.PI * 2);
             this.ctx.fill();
         }
