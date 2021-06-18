@@ -8,6 +8,7 @@ import Maze from "./content/maze/Maze";
 import Boids from "./content/boids/Boids";
 import LSystem from "./content/l-system/LSystem"
 import Home from "./content/home/Home";
+import NeuralNetwork from "./content/nn/NeuralNetwork";
 
 function App() {
 
@@ -17,7 +18,8 @@ function App() {
     {name: "Game of Life", path: "/game-of-life"},
     {name: "Maze-Solver", path: "/maze"},
     {name: "L System", path: "/l-system"},
-    {name: "Boids", path: "/boids"}
+    {name: "Boids", path: "/boids"},
+    {name: "Neural Networks", path:"/nn"}
   ]
 
   return (
@@ -47,6 +49,11 @@ function App() {
             <Route path="/boids">
               <Page pages={pages}>
                 <Boids />
+              </Page>
+            </Route>
+            <Route path="/nn">
+              <Page pages={pages}>
+                <NeuralNetwork />
               </Page>
             </Route>
             <Route path="/">
