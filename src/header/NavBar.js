@@ -6,16 +6,25 @@ class NavBar extends React.Component {
     constructor(props) {
         super(props);
 
-        this.enabled = false;
+        this.state = {
+            enabled: false
+        }
 
         this.toggleNav = this.toggleNav.bind(this);
         this.toggleRef = React.createRef();
     }
 
     toggleNav() {
-        this.toggleRef.current.style.marginTop = this.enabled ? "-100%" : "0";
-        this.toggleRef.current.style.visibility = this.enabled ? "hidden" : "visible";
-        this.enabled = !this.enabled;
+        if (this.state.enabled) {
+            this.toggleRef.current.classList.remove("nav-toggle-zone-enabled");
+        } else {
+            this.toggleRef.current.classList.add("nav-toggle-zone-enabled");
+        }
+        // this.toggleRef.current.style.marginTop = this.state.enabled ? "-100%" : "0";
+        // this.toggleRef.current.style.visibility = this.state.enabled ? "hidden" : "visible";
+        this.setState((prevState) => {
+            return {enabled: !prevState.enabled}
+        })
     }
 
     componentDidMount() {
@@ -26,8 +35,20 @@ class NavBar extends React.Component {
         window.removeEventListener('resize', this.handleWindowResize);
     }
 
+    getTitle() {
+        if (this.state.enabled) {
+            return '';
+        }
+        for (let i = 0; i < this.props.pages.length; i++) {
+            const page = this.props.pages[i];
+            if (page.path === this.props.activePath) {
+                return page.name;
+            }
+        }
+    }
+
     handleWindowResize = () => {
-        if (window.innerWidth > 600 && this.enabled) {
+        if (window.innerWidth > 600 && this.state.enabled) {
             this.toggleNav();
         }
     }
@@ -42,6 +63,7 @@ class NavBar extends React.Component {
                     )}
                 </div>
                 <div className="nav-bar-stacked">
+                    <span className="nav-component">{this.getTitle()}</span>
                     <button className="btn nav-toggle" onClick={this.toggleNav}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                              className="bi bi-list"
@@ -54,7 +76,7 @@ class NavBar extends React.Component {
                 <div className="nav-toggle-zone" ref={this.toggleRef}>
                     {this.props.pages.map((comp, index) =>
                         <NavComponent active={this.props.activePath === comp.path} title={comp.name} path={comp.path}
-                                      key={index} classes="nav-component-stacked"/>
+                                      key={index} classes="nav-component-stacked" clickFn={this.toggleNav}/>
                     )}
                 </div>
             </div>
