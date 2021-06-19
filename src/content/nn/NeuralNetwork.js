@@ -6,26 +6,16 @@ import { togglePopover} from "../common/PopoverUtilities";
 
 const node_radius = 20;
 const layer_size = 4;
+const max_node_difference = 200;
+const node_x_spacing = 150;
+const starting_x = 50;
+const node_default_color = "#008000";
+const edge_default_color = "#FFA500";
 
 class NeuralNetwork extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            nn: {
-                nodes: {
-                    0: {x: 100, y: 100, input: true, color: "#008000"},
-                    1: {x: 100, y: 200, input: true, color: "#008000"},
-                    2: {x: 200, y: 150, output: true, color: "#008000"}
-                },
-                edges: {
-                    0: {n1: 0, n2: 2, w: 1, color: "#FFA500"},
-                    1: {n1: 1, n2: 2, w: 0.5, color: "#FFA500"}
-                },
-                layers: {
-                    0: {input: true, nodes: [0, 1]},
-                    1: {output: true, nodes: [2]}
-                }
-            },
             width: 1000,
             height: 500,
             nodeSelected: false,
@@ -42,11 +32,37 @@ class NeuralNetwork extends React.Component {
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
         this.colorChange = this.colorChange.bind(this);
         this.addLayer = this.addLayer.bind(this);
+        this.addInputNode = this.addInputNode.bind(this);
+    }
+
+    initializeNetwork(callback) {
+        this.setState(() => {
+            const nn = {
+                nodes: {},
+                edges: {
+                    0: {n1: 0, n2: 2, w: Math.random(), color: edge_default_color},
+                    1: {n1: 1, n2: 2, w: Math.random(), color: edge_default_color}
+                },
+                layers: {
+                    0: {input: true, nodes: [0, 1]},
+                    1: {output: true, nodes: [2]}
+                }
+            };
+            const yValues = this.calculateNodeYValues(2);
+
+            nn.nodes = {
+                0: {x: starting_x, y: yValues[0], input: true, color: node_default_color},
+                1: {x: starting_x, y: yValues[1], input: true, color: node_default_color},
+                2: {x: starting_x + node_x_spacing, y: this.calculateNodeYValues(1)[0], output: true, color: node_default_color}
+            }
+
+            return {nn: nn};
+        }, callback);
     }
 
     componentDidMount() {
         this.ctx = this.canvasRef.current.getContext('2d');
-        this.drawNeuralNetwork();
+        this.initializeNetwork(this.drawNeuralNetwork);
     }
 
     distance(x1, y1, x2, y2) {
@@ -85,16 +101,13 @@ class NeuralNetwork extends React.Component {
         let toReturn;
 
         this.setState((prevState) => {
-            // const nn = Object.assign({}, prevState.nn);
             const nn = JSON.parse(JSON.stringify(prevState.nn))
 
             if (name === "color-selector") {
                 if (this.state.nodeSelected) {
-                    // nn.nodes[prevState.selectedObject.id].color = value;
                     nn.nodes[prevState.selectedId].color = value;
 
                 } else {
-                    // nn.edges[prevState.selectedObject.id].color = value;
                     nn.edges[prevState.selectedId].color = value;
                 }
                 toReturn = {
@@ -103,7 +116,6 @@ class NeuralNetwork extends React.Component {
                 }
             } else if (name === "weight-selector") {
                 if (!this.state.nodeSelected) {
-                    // nn.edges[prevState.selectedObject.id].w = value;
                     nn.edges[prevState.selectedId].w = value;
                 }
                 toReturn = {
@@ -143,7 +155,7 @@ class NeuralNetwork extends React.Component {
             const dist = this.distanceToLine(n1.x, n1.y, n2.x, n2.y, x, y);
 
             if (((n1.x < x && x < n2.x) || (n2.x < x && x < n1.x))
-                && (dist <= edge.w * 10)) {
+                && (dist <= 5)) {
                 return edgeId;
             }
         }
@@ -170,10 +182,8 @@ class NeuralNetwork extends React.Component {
     }
 
     addLayer() {
-        // TODO: Edge things
-
         this.setState(prevState => {
-            const nn = JSON.parse(JSON.stringify(prevState.nn))
+            const nn = JSON.parse(JSON.stringify(prevState.nn));
             const startingId = Object.keys(nn.nodes).length;
             let tempCounter = prevState.edgeIdCounter;
 
@@ -181,16 +191,17 @@ class NeuralNetwork extends React.Component {
             const outputIds = [];
             for (let i = 0; i < startingId; i++) {
                 if (nn.nodes[i].output) {
-                    nn.nodes[i].x += 100;
+                    nn.nodes[i].x += node_x_spacing;
                     outputIds.push(i);
                 }
             }
 
             // add new nodes
             const newNodeIds = [];
+            const yValues = this.calculateNodeYValues(layer_size);
             for (let i = 0; i < layer_size; i++) {
 
-                nn.nodes[startingId + i] = {x: 200 + 100 * this.layers, y: 20 + i * 80, color: "#00F000"};
+                nn.nodes[startingId + i] = {x: starting_x + node_x_spacing * (this.layers + 1), y: yValues[i], color: node_default_color};
                 newNodeIds.push(startingId + i);
             }
 
@@ -199,7 +210,6 @@ class NeuralNetwork extends React.Component {
 
             // remove edges connecting to output layer
             let removed = 0;
-
             const newEdges = {};
 
             for (const edgeId in nn.edges) {
@@ -207,29 +217,27 @@ class NeuralNetwork extends React.Component {
                     newEdges[edgeId] = nn.edges[edgeId];
                 } else {
                     removed++;
+                    console.log(nn.edges[edgeId])
                 }
             }
 
+            console.log('removed ' + removed + ' edges')
+
             nn.edges = newEdges;
-
-            // nn.edges = nn.edges.filter(edge => {
-            //     return !outputIds.includes(edge.n2);
-            // });
-
-            tempCounter -= removed;
+            // tempCounter -= removed;
 
             // add edges from previous layer to the next layer
             if (this.layers === 0) {
                 // if first layer, add to input layer, else add to previous layer
                 for (let i = 0; i < nn.layers["0"].nodes.length; i++) {
                     for (let j = 0; j < newNodeIds.length; j++) {
-                        nn.edges[tempCounter++] = {n1: nn.layers["0"].nodes[i], n2: newNodeIds[j], w: 1, color: "#FFA500"};
+                        nn.edges[tempCounter++] = {n1: nn.layers["0"].nodes[i], n2: newNodeIds[j], w: Math.random(), color: edge_default_color};
                     }
                 }
             } else {
                 for (let i = 0; i < nn.layers[this.layers + 1].nodes.length; i++) {
                     for (let j = 0; j < newNodeIds.length; j++) {
-                        nn.edges[tempCounter++] = {n1: nn.layers[this.layers + 1].nodes[i], n2: newNodeIds[j], w: 1, color: "#FFA500"};
+                        nn.edges[tempCounter++] = {n1: nn.layers[this.layers + 1].nodes[i], n2: newNodeIds[j], w: Math.random(), color: edge_default_color};
                     }
                 }
             }
@@ -237,19 +245,48 @@ class NeuralNetwork extends React.Component {
             // add edges from the new layer to the output layer
             for (let i = 0; i < nn.layers[this.layers + 2].nodes.length; i++) {
                 for (let j = 0; j < nn.layers["1"].nodes.length; j++) {
-                    nn.edges[tempCounter++] = {n1: nn.layers[this.layers + 2].nodes[i], n2: nn.layers["1"].nodes[j], w: 1, color: "#FFA500"}
+                    nn.edges[tempCounter++] = {n1: nn.layers[this.layers + 2].nodes[i], n2: nn.layers["1"].nodes[j], w: Math.random(), color: edge_default_color}
                 }
             }
-
-            console.log(nn)
 
             return {nn: nn, edgeIdCounter: tempCounter};
 
         }, () => {
-
             this.drawNeuralNetwork();
             this.layers++;
         });
+    }
+
+    addInputNode() {
+        this.setState(prevState => {
+            const nn = JSON.parse(JSON.stringify(prevState.nn));
+            const id = Object.keys(nn.nodes).length;
+            const nodeIds = nn.layers[0].nodes;
+            const layerIndex = nodeIds.length;
+            const yValues = this.calculateNodeYValues(layerIndex + 1);
+            const nextLayerIds = this.layers === 0 ? nn.layers[1].nodes : nn.layers[2].nodes;
+            let nextEdge = prevState.edgeIdCounter;
+
+            nn.nodes[id] = {x: starting_x, y: yValues[layerIndex], input: true, color: node_default_color}
+
+            nodeIds.forEach((element, index) => {
+               nn.nodes[element].y = yValues[index];
+            });
+
+            nn.layers[0].nodes.push(id);
+
+            nextLayerIds.forEach(element => {
+                nn.edges[nextEdge++] = {n1: id, n2: element, color: edge_default_color, w: Math.random()}
+            });
+
+            return {nn: nn, edgeIdCounter: nextEdge};
+        }, () => {
+            this.drawNeuralNetwork();
+        });
+    }
+
+    removeInputNode() {
+
     }
 
     drawNeuralNetwork() {
@@ -288,16 +325,39 @@ class NeuralNetwork extends React.Component {
         this.ctx.fill();
     }
 
+    calculateNodeYValues(numNodes) {
+        const height = this.state.height;
+        const result = [];
+
+        let space = height / (numNodes + 1);
+
+        if (space > max_node_difference && numNodes > 1) {
+            space = max_node_difference;
+            const leftOver = height - space * (numNodes + 1);
+            for (let i = 0; i < numNodes; i++) {
+                result.push(leftOver / 2 + space * i)
+            }
+        } else {
+            for (let i = 0; i < numNodes; i++) {
+                result.push(space * (i + 1));
+            }
+        }
+
+        return result;
+
+    }
+
     render() {
         return (
             <div>
                 <div className="container">
                     <div className="row controls-container">
                         <button onClick={this.addLayer}>Add Layer</button>
+                        <button onClick={this.addInputNode}>Add Input Node</button>
                     </div>
                     <div className="row nn-canvas-container">
                         <canvas width={this.state.width} height={this.state.height} ref={this.canvasRef}
-                                onClick={this.handleCanvasClick}/>
+                                onClick={this.handleCanvasClick} className="canvas-outline"/>
                     </div>
                 </div>
                 <Popover popoverId="node-edge-info">
