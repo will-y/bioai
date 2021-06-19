@@ -209,19 +209,13 @@ class NeuralNetwork extends React.Component {
             nn.layers[this.layers + 2].nodes = newNodeIds;
 
             // remove edges connecting to output layer
-            let removed = 0;
             const newEdges = {};
 
             for (const edgeId in nn.edges) {
                 if (!outputIds.includes(nn.edges[edgeId].n2)) {
                     newEdges[edgeId] = nn.edges[edgeId];
-                } else {
-                    removed++;
-                    console.log(nn.edges[edgeId])
                 }
             }
-
-            console.log('removed ' + removed + ' edges')
 
             nn.edges = newEdges;
             // tempCounter -= removed;
