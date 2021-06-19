@@ -39,6 +39,6 @@
     cursor: pointer;
 }
 
-.def {
-
+select, input {
+    margin-left: 10px;
 }

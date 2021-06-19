@@ -5,6 +5,8 @@ import Popover from "../common/Popover";
 import { togglePopover} from "../common/PopoverUtilities";
 
 const node_radius = 20;
+const output_layer_size = 1;
+const layer_size = 4;
 
 class NeuralNetwork extends React.Component {
     constructor(props) {
@@ -25,7 +27,8 @@ class NeuralNetwork extends React.Component {
             height: 500,
             selectedObject: {},
             nodeSelected: false,
-            selectedColor: ""
+            selectedColor: "",
+            selectedWeight: 0
         }
 
         this.canvasRef = React.createRef();
@@ -33,6 +36,7 @@ class NeuralNetwork extends React.Component {
 
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
         this.colorChange = this.colorChange.bind(this);
+        this.addLayer = this.addLayer.bind(this);
     }
 
     componentDidMount() {
@@ -72,17 +76,32 @@ class NeuralNetwork extends React.Component {
 
     colorChange(event) {
         const value = event.target.value;
+        const name = event.target.name;
+        let toReturn;
+
         this.setState((prevState) => {
             const nn = Object.assign({}, prevState.nn);
-            if (this.state.nodeSelected) {
-                nn.nodes[prevState.selectedObject.id].color = value;
-            } else {
-                nn.edges[prevState.selectedObject.id].color = value;
+            if (name === "color-selector") {
+                if (this.state.nodeSelected) {
+                    nn.nodes[prevState.selectedObject.id].color = value;
+                } else {
+                    nn.edges[prevState.selectedObject.id].color = value;
+                }
+                toReturn = {
+                    selectedColor: value,
+                    nn: nn
+                }
+            } else if (name === "weight-selector") {
+                if (!this.state.nodeSelected) {
+                    nn.edges[prevState.selectedObject.id].w = value;
+                }
+                toReturn = {
+                    selectedWeight: value,
+                    nn: nn
+                }
             }
-            return {
-                selectedColor: value,
-                nn: nn
-            }
+
+            return toReturn;
         }, () => {
             this.drawNeuralNetwork();
         });
@@ -120,22 +139,42 @@ class NeuralNetwork extends React.Component {
     }
 
     handleClickNode(id, isNode) {
-        console.log(`clicked ${isNode ? "node" : "edge"} id: ` + id);
+        // console.log(`clicked ${isNode ? "node" : "edge"} id: ` + id);
 
         const toTogglePopover = this.popoverEnabled || Object.keys(this.state.selectedObject).length === 0 || (id === this.state.selectedObject.id && this.state.nodeSelected === isNode);
 
         this.setState((prevState) => {
             const selectedObject = isNode ? prevState.nn.nodes[id] : prevState.nn.edges[id];
             const selectedColor = isNode ? prevState.nn.nodes[id].color : prevState.nn.edges[id].color;
+            const selectedWeight = isNode ? 0 : prevState.nn.edges[id].w;
             return {
                 selectedObject: selectedObject,
                 nodeSelected: isNode,
                 selectedColor: selectedColor,
+                selectedWeight: selectedWeight
             }
         }, () => {
             if (toTogglePopover) {
                 this.popoverEnabled = togglePopover("node-edge-info");
             }
+        });
+    }
+
+    addLayer() {
+        // TODO: Edge things
+        const outputs = this.state.nn.nodes.slice(-output_layer_size);
+
+        for (let i = 0; i < output_layer_size; i++) {
+            outputs[i].x += 200;
+        }
+        this.setState((prevState) => {
+            const nn = Object.assign({}, prevState.nn);
+            let startingId = nn.nodes.length;
+            for (let i = 0; i < layer_size; i++) {
+                nn.nodes.push({x: 250, y: 20 + i * 80, id: startingId++, input: false, color: "#008000", node: true});
+            }
+        }, () => {
+            this.drawNeuralNetwork();
         });
     }
 
@@ -180,20 +219,31 @@ class NeuralNetwork extends React.Component {
             <div>
                 <div className="container">
                     <div className="row controls-container">
-                        <button>Test</button>
-                        <button>Test</button>
-                        <button>Test</button>
-                        <button>Test</button>
-
+                        <button onClick={this.addLayer}>Add Layer</button>
                     </div>
                     <div className="row nn-canvas-container">
-                        <canvas width={this.state.width} height={this.state.height} ref={this.canvasRef} onClick={this.handleCanvasClick}/>
+                        <canvas width={this.state.width} height={this.state.height} ref={this.canvasRef}
+                                onClick={this.handleCanvasClick}/>
                     </div>
                 </div>
                 <Popover popoverId="node-edge-info">
                     <h2>{this.state.nodeSelected ? "Node" : "Edge"} Info</h2>
                     <p>ID: {this.state.selectedObject.id}</p>
-                    <input type="color" value={this.state.selectedColor} onChange={this.colorChange}/>
+                    <label htmlFor="color-selector">Color: </label>
+                    <input type="color" value={this.state.selectedColor} onChange={this.colorChange}
+                           name="color-selector"/>
+                    {this.state.nodeSelected ?
+                        <div>
+                            <label htmlFor="activation-function">Activation Function: </label>
+                            <select name="activation-function">
+                                <option>Tan</option>
+                                <option>RELU</option>
+                            </select>
+                        </div> :
+                        <div>
+                            <label htmlFor="weight-selector">Weight: </label>
+                            <input name="weight-selector" type="number" value={this.state.selectedWeight} onChange={this.colorChange} step={0.1}/>
+                        </div>}
                 </Popover>
             </div>
         );
