@@ -234,6 +234,15 @@ class NeuralNetwork extends React.Component {
                 }
             }
 
+            // add edges from the new layer to the output layer
+            for (let i = 0; i < nn.layers[this.layers + 2].nodes.length; i++) {
+                for (let j = 0; j < nn.layers["1"].nodes.length; j++) {
+                    nn.edges[tempCounter++] = {n1: nn.layers[this.layers + 2].nodes[i], n2: nn.layers["1"].nodes[j], w: 1, color: "#FFA500"}
+                }
+            }
+
+            console.log(nn)
+
             return {nn: nn, edgeIdCounter: tempCounter};
 
         }, () => {
@@ -244,7 +253,6 @@ class NeuralNetwork extends React.Component {
     }
 
     drawNeuralNetwork() {
-        console.log(this.state.nn);
         const nodes = this.state.nn.nodes;
         const edges = this.state.nn.edges;
 
