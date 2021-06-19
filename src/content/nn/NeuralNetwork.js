@@ -5,7 +5,6 @@ import Popover from "../common/Popover";
 import { togglePopover} from "../common/PopoverUtilities";
 
 const node_radius = 20;
-const output_layer_size = 1;
 const layer_size = 4;
 
 class NeuralNetwork extends React.Component {
@@ -33,6 +32,7 @@ class NeuralNetwork extends React.Component {
 
         this.canvasRef = React.createRef();
         this.popoverEnabled = false;
+        this.layers = 0;
 
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
         this.colorChange = this.colorChange.bind(this);
@@ -80,6 +80,7 @@ class NeuralNetwork extends React.Component {
         let toReturn;
 
         this.setState((prevState) => {
+            console.log('setting state: colorChange')
             const nn = Object.assign({}, prevState.nn);
             if (name === "color-selector") {
                 if (this.state.nodeSelected) {
@@ -144,6 +145,7 @@ class NeuralNetwork extends React.Component {
         const toTogglePopover = this.popoverEnabled || Object.keys(this.state.selectedObject).length === 0 || (id === this.state.selectedObject.id && this.state.nodeSelected === isNode);
 
         this.setState((prevState) => {
+            console.log('setting state: handleClickNode')
             const selectedObject = isNode ? prevState.nn.nodes[id] : prevState.nn.edges[id];
             const selectedColor = isNode ? prevState.nn.nodes[id].color : prevState.nn.edges[id].color;
             const selectedWeight = isNode ? 0 : prevState.nn.edges[id].w;
@@ -161,20 +163,39 @@ class NeuralNetwork extends React.Component {
     }
 
     addLayer() {
-        // TODO: Edge things
-        const outputs = this.state.nn.nodes.slice(-output_layer_size);
+        // TODO: Edge things and multiple layers
+        // const outputs = this.state.nn.nodes.splice(-output_layer_size);
+        //
+        // // move output layer out
+        // for (let i = 0; i < output_layer_size; i++) {
+        //     outputs[i].x += 100;
+        // }
 
-        for (let i = 0; i < output_layer_size; i++) {
-            outputs[i].x += 200;
-        }
-        this.setState((prevState) => {
-            const nn = Object.assign({}, prevState.nn);
-            let startingId = nn.nodes.length;
-            for (let i = 0; i < layer_size; i++) {
-                nn.nodes.push({x: 250, y: 20 + i * 80, id: startingId++, input: false, color: "#008000", node: true});
+        this.setState(prevState => {
+            console.log('setting state: addLayer')
+            const nn = JSON.parse(JSON.stringify(prevState.nn))
+           // const nn = Object.assign({}, prevState.nn);
+            const startingId = nn.nodes.length;
+
+            for (let i = 0; i < startingId; i++) {
+                if (nn.nodes[i].output) {
+                    nn.nodes[i].x += 100;
+                    console.log('here ' + nn.nodes[i].x);
+                }
             }
+
+            for (let i = 0; i < layer_size; i++) {
+                console.log('adding node')
+                nn.nodes.push({x: 200 + 100 * this.layers, y: 20 + i * 80, id: startingId + i, input: false, color: "#00F000", node: true});
+            }
+
+            console.log(nn);
+
+            return {nn: nn};
+
         }, () => {
             this.drawNeuralNetwork();
+            this.layers++;
         });
     }
 
@@ -239,6 +260,8 @@ class NeuralNetwork extends React.Component {
                                 <option>Tan</option>
                                 <option>RELU</option>
                             </select>
+                            <p>X: {this.state.selectedObject.x}</p>
+                            <p>Y: {this.state.selectedObject.y}</p>
                         </div> :
                         <div>
                             <label htmlFor="weight-selector">Weight: </label>
