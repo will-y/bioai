@@ -6,6 +6,8 @@ export function togglePopover(id) {
     } else {
         enablePopover(id);
     }
+
+    return vis === "visible";
 }
 
 export function enablePopover(id) {
