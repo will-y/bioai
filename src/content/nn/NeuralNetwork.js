@@ -32,7 +32,7 @@ class NeuralNetwork extends React.Component {
         this.canvasRef = React.createRef();
         this.popoverEnabled = false;
         this.layers = 0;
-        this.layerSize = 4;
+        this.layerSize = 2;
 
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
         this.colorChange = this.colorChange.bind(this);
@@ -265,6 +265,7 @@ class NeuralNetwork extends React.Component {
         }, () => {
             this.drawNeuralNetwork();
             this.layers++;
+            console.log(this.layers);
         });
     }
 
@@ -301,40 +302,97 @@ class NeuralNetwork extends React.Component {
 
     removeNode(id) {
         //TODO: Deal with removing last node in a non output or input layer
+        let deletedLayer = false;
         this.setState(prevState => {
             const nn = JSON.parse(JSON.stringify(prevState.nn));
             const layer = this.findLayer(id, prevState);
+            let edgeCounter = prevState.edgeIdCounter;
 
             if (nn.layers[layer].nodes.length === 1) {
-                console.log('here');
-                alert("Cannot delete last node in input or output layer");
-                return {};
+                if (nn.layers[layer].output || nn.layers[layer].input) {
+                    alert("Cannot delete last node in input or output layer");
+                    return {};
+                } else {
+                    // things for if last node in layer
+                    delete nn.layers[layer];
+                    deletedLayer = true;
+                    for (let i = 0; i < this.layers + 2; i++) {
+                        if (nn.layers[i] && !nn.layers[i].input && !nn.layers[i].output && i > layer) {
+                            nn.layers[i - 1] = nn.layers[i];
+                            // move other layers in
+                            nn.layers[i - 1].nodes.forEach(element => {
+                                nn.nodes[element].x -= node_x_spacing;
+                            });
+                        }
+                    }
+
+                    // move output layer in
+                    nn.layers[1].nodes.forEach(element => {
+                       nn.nodes[element].x -= node_x_spacing;
+                    });
+
+                    // add connections between two layers surrounding removed one (itself and -1 normally)
+                    if (this.layers === 1) {
+                        // all layers gone connect input and output
+                        edgeCounter = this.connectLayers(0, 1, nn, prevState.edgeIdCounter);
+                    } else {
+                        const layerToConnect = nn.layers[layer] ? layer : 1;
+                        const layerToStart = (layer - 1) === 1 ? 0 : layer - 1;
+                        edgeCounter = this.connectLayers(layerToStart, layerToConnect, nn, prevState.edgeIdCounter);
+                    }
+                }
             }
 
             delete nn.nodes[id];
-            nn.layers[layer].nodes = nn.layers[layer].nodes.filter(element => element !== id);
+            if (!deletedLayer) {
+                // things for if not last node in layer
+                nn.layers[layer].nodes = nn.layers[layer].nodes.filter(element => element !== id);
 
+                // reposition nodes in layer
+                const yValues = this.calculateNodeYValues(nn.layers[layer].nodes.length);
+
+                nn.layers[layer].nodes.forEach((element, index) => {
+                    nn.nodes[element].y = yValues[index];
+                });
+            }
+
+            // things for all cases
+            // delete edges into and out of the deleted node
             for (const edgeId in nn.edges) {
                 if (nn.edges[edgeId].n1 === id || nn.edges[edgeId].n2 === id) {
                     delete nn.edges[edgeId];
                 }
             }
 
-            // reposition nodes in layer
-            const yValues = this.calculateNodeYValues(nn.layers[layer].nodes.length);
-
-            nn.layers[layer].nodes.forEach((element, index) => {
-                nn.nodes[element].y = yValues[index];
-            });
-
             disablePopover(popover_id);
             this.popoverEnabled = false;
 
             return {
                 nn: nn,
-                selectedId: -1
+                selectedId: -1,
+                edgeIdCounter: edgeCounter
             };
-        }, this.drawNeuralNetwork);
+        }, () => {
+            this.drawNeuralNetwork();
+            if (deletedLayer) {
+                this.layers--;
+            }
+        });
+    }
+
+    // Connects two layers, modifies the nn object passed in
+    // returns the new edge counter (to be updated in setState where this should be called)
+    connectLayers(layer1, layer2, nn, initialEdgeCounter) {
+        let edgeCounter = parseInt(initialEdgeCounter);
+
+        nn.layers[layer1].nodes.forEach(layer1Node => {
+            nn.layers[layer2].nodes.forEach(layer2Node => {
+                console.log(`adding edge from ${layer1Node} to ${layer2Node} id: ${edgeCounter}`)
+                nn.edges[edgeCounter++] = {n1: layer1Node, n2: layer2Node, w: Math.random(), color: edge_default_color}
+            });
+        });
+
+        return edgeCounter;
     }
 
     findLayer(nodeId, state) {
