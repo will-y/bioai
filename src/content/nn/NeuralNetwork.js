@@ -32,7 +32,7 @@ class NeuralNetwork extends React.Component {
         this.canvasRef = React.createRef();
         this.popoverEnabled = false;
         this.layers = 0;
-        this.layerSize = 2;
+        this.layerSize = 4;
 
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
         this.colorChange = this.colorChange.bind(this);
@@ -235,37 +235,23 @@ class NeuralNetwork extends React.Component {
             }
 
             nn.edges = newEdges;
-            // tempCounter -= removed;
 
             // add edges from previous layer to the next layer
             if (this.layers === 0) {
                 // if first layer, add to input layer, else add to previous layer
-                for (let i = 0; i < nn.layers["0"].nodes.length; i++) {
-                    for (let j = 0; j < newNodeIds.length; j++) {
-                        nn.edges[tempCounter++] = {n1: nn.layers["0"].nodes[i], n2: newNodeIds[j], w: Math.random(), color: edge_default_color};
-                    }
-                }
+                tempCounter = this.connectLayers(0, this.layers + 2, nn, tempCounter);
             } else {
-                for (let i = 0; i < nn.layers[this.layers + 1].nodes.length; i++) {
-                    for (let j = 0; j < newNodeIds.length; j++) {
-                        nn.edges[tempCounter++] = {n1: nn.layers[this.layers + 1].nodes[i], n2: newNodeIds[j], w: Math.random(), color: edge_default_color};
-                    }
-                }
+                tempCounter = this.connectLayers(this.layers + 1, this.layers + 2, nn, tempCounter);
             }
 
             // add edges from the new layer to the output layer
-            for (let i = 0; i < nn.layers[this.layers + 2].nodes.length; i++) {
-                for (let j = 0; j < nn.layers["1"].nodes.length; j++) {
-                    nn.edges[tempCounter++] = {n1: nn.layers[this.layers + 2].nodes[i], n2: nn.layers["1"].nodes[j], w: Math.random(), color: edge_default_color}
-                }
-            }
+            tempCounter = this.connectLayers(this.layers + 2, 1, nn, tempCounter);
 
             return {nn: nn, edgeIdCounter: tempCounter, nodeIdCounter: startingId};
 
         }, () => {
             this.drawNeuralNetwork();
             this.layers++;
-            console.log(this.layers);
         });
     }
 
@@ -301,7 +287,6 @@ class NeuralNetwork extends React.Component {
     }
 
     removeNode(id) {
-        //TODO: Deal with removing last node in a non output or input layer
         let deletedLayer = false;
         this.setState(prevState => {
             const nn = JSON.parse(JSON.stringify(prevState.nn));
@@ -380,14 +365,13 @@ class NeuralNetwork extends React.Component {
         });
     }
 
-    // Connects two layers, modifies the nn object passed in
+    // Connects two layers, modifies the nn object passed in, pass in the current edge ID counter
     // returns the new edge counter (to be updated in setState where this should be called)
     connectLayers(layer1, layer2, nn, initialEdgeCounter) {
         let edgeCounter = parseInt(initialEdgeCounter);
 
         nn.layers[layer1].nodes.forEach(layer1Node => {
             nn.layers[layer2].nodes.forEach(layer2Node => {
-                console.log(`adding edge from ${layer1Node} to ${layer2Node} id: ${edgeCounter}`)
                 nn.edges[edgeCounter++] = {n1: layer1Node, n2: layer2Node, w: Math.random(), color: edge_default_color}
             });
         });
