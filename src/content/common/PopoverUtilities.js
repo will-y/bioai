@@ -21,7 +21,9 @@ export function enablePopover(id) {
 export function disablePopover(id) {
     const popover = document.getElementById(id);
 
-    popover.style.visibility = "hidden";
-    popover.style.opacity = "0";
-    popover.style.right = "-33%";
+    if (popover) {
+        popover.style.visibility = "hidden";
+        popover.style.opacity = "0";
+        popover.style.right = "-33%";
+    }
 }

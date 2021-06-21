@@ -2,7 +2,7 @@ import React from "react";
 import './NeuralNetwork.css';
 import '../Page.css';
 import Popover from "../common/Popover";
-import { togglePopover} from "../common/PopoverUtilities";
+import {disablePopover, togglePopover} from "../common/PopoverUtilities";
 
 const node_radius = 20;
 const max_node_difference = 200;
@@ -10,6 +10,7 @@ const node_x_spacing = 150;
 const starting_x = 50;
 const node_default_color = "#008000";
 const edge_default_color = "#FFA500";
+const popover_id = "node-edge-info";
 
 class NeuralNetwork extends React.Component {
     constructor(props) {
@@ -35,6 +36,7 @@ class NeuralNetwork extends React.Component {
         this.addLayer = this.addLayer.bind(this);
         this.addInputNode = this.addInputNode.bind(this);
         this.removeInputNode = this.removeInputNode.bind(this);
+        this.removeNode = this.removeNode.bind(this);
     }
 
     initializeNetwork(callback) {
@@ -178,7 +180,7 @@ class NeuralNetwork extends React.Component {
             }
         }, () => {
             if (toTogglePopover) {
-                this.popoverEnabled = togglePopover("node-edge-info");
+                this.popoverEnabled = togglePopover(popover_id);
             }
         });
     }
@@ -285,11 +287,13 @@ class NeuralNetwork extends React.Component {
     }
 
     removeNode(id) {
+        //TODO: Deal with removing last node in a non output or input layer
         this.setState(prevState => {
             const nn = JSON.parse(JSON.stringify(prevState.nn));
             const layer = this.findLayer(id, prevState);
 
             if (nn.layers[layer].nodes.length === 1) {
+                alert("Cannot delete last node in input or output layer");
                 return {};
             }
 
@@ -309,20 +313,28 @@ class NeuralNetwork extends React.Component {
                 nn.nodes[element].y = yValues[index];
             });
 
-            return {nn: nn};
+            // selectedId: id,
+            // nodeSelected: isNode,
+            // selectedColor: selectedColor,
+            // selectedWeight: selectedWeight
+
+            disablePopover(popover_id);
+            this.popoverEnabled = false;
+
+            return {
+                nn: nn,
+                selectedId: -1
+            };
         }, this.drawNeuralNetwork);
     }
 
     findLayer(nodeId, state) {
         for (const layerId in state.nn.layers) {
             if (state.nn.layers[layerId].nodes.includes(nodeId)) {
-                console.log('found layer ' + layerId + ' for node ' + nodeId)
                 return layerId;
             }
         }
 
-        console.log('here with nodeId ' + nodeId);
-        console.log(state);
         return -1;
     }
 
@@ -398,7 +410,7 @@ class NeuralNetwork extends React.Component {
                                 onClick={this.handleCanvasClick} className="canvas-outline"/>
                     </div>
                 </div>
-                <Popover popoverId="node-edge-info">
+                <Popover popoverId={popover_id}>
                     <h2>{this.state.nodeSelected ? "Node" : "Edge"} Info</h2>
                     <p>ID: {this.state.selectedId}</p>
                     <label htmlFor="color-selector">Color: </label>
@@ -411,8 +423,13 @@ class NeuralNetwork extends React.Component {
                                 <option>Tan</option>
                                 <option>RELU</option>
                             </select>
-                            <p>X: {this.state.nn.nodes[this.state.selectedId].x}</p>
-                            <p>Y: {this.state.nn.nodes[this.state.selectedId].y}</p>
+                            {this.state.selectedId !== -1 &&
+                                <div>
+                                    <p>X: {this.state.nn.nodes[this.state.selectedId].x}</p>
+                                    <p>Y: {this.state.nn.nodes[this.state.selectedId].y}</p>
+                                </div>
+                            }
+                            <button className="btn btn-danger" onClick={() => this.removeNode(parseInt(this.state.selectedId))}>Delete</button>
                         </div> :
                         <div>
                             <label htmlFor="weight-selector">Weight: </label>
