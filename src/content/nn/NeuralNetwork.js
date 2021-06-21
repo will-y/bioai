@@ -11,6 +11,8 @@ const starting_x = 50;
 const node_default_color = "#008000";
 const edge_default_color = "#FFA500";
 const popover_id = "node-edge-info";
+// use this: https://www.analyticsvidhya.com/blog/2020/01/fundamentals-deep-learning-activation-functions-when-to-use-them/
+const activation_functions = ["Binary Step", "Linear", "Sigmoid", "Tanh", "ReLU", "Swish", "Softmax"];
 
 class NeuralNetwork extends React.Component {
     constructor(props) {
@@ -22,6 +24,7 @@ class NeuralNetwork extends React.Component {
             selectedId: -1,
             selectedColor: "",
             selectedWeight: 0,
+            selectedActivationFunction: -1,
             edgeIdCounter: 2,
             nodeIdCounter: 3
         }
@@ -55,9 +58,9 @@ class NeuralNetwork extends React.Component {
             const yValues = this.calculateNodeYValues(2);
 
             nn.nodes = {
-                0: {x: starting_x, y: yValues[0], input: true, color: node_default_color},
-                1: {x: starting_x, y: yValues[1], input: true, color: node_default_color},
-                2: {x: starting_x + node_x_spacing, y: this.calculateNodeYValues(1)[0], output: true, color: node_default_color}
+                0: {x: starting_x, y: yValues[0], input: true, color: node_default_color, activationFunction: activation_functions[0]},
+                1: {x: starting_x, y: yValues[1], input: true, color: node_default_color, activationFunction: activation_functions[0]},
+                2: {x: starting_x + node_x_spacing, y: this.calculateNodeYValues(1)[0], output: true, color: node_default_color, activationFunction: activation_functions[0]}
             }
 
             return {nn: nn};
@@ -110,7 +113,6 @@ class NeuralNetwork extends React.Component {
             if (name === "color-selector") {
                 if (this.state.nodeSelected) {
                     nn.nodes[prevState.selectedId].color = value;
-
                 } else {
                     nn.edges[prevState.selectedId].color = value;
                 }
@@ -124,6 +126,14 @@ class NeuralNetwork extends React.Component {
                 }
                 toReturn = {
                     selectedWeight: value,
+                    nn: nn
+                }
+            } else if (name === "activation-selector") {
+                if (this.state.nodeSelected) {
+                    nn.nodes[prevState.selectedId].activationFunction = value;
+                }
+                toReturn = {
+                    selectedActivationFunction: value,
                     nn: nn
                 }
             }
@@ -172,11 +182,14 @@ class NeuralNetwork extends React.Component {
         this.setState((prevState) => {
             const selectedColor = isNode ? prevState.nn.nodes[id].color : prevState.nn.edges[id].color;
             const selectedWeight = isNode ? 0 : prevState.nn.edges[id].w;
+            const selectedActivationFunction = isNode ? prevState.nn.nodes[id].activationFunction : -1;
+
             return {
                 selectedId: id,
                 nodeSelected: isNode,
                 selectedColor: selectedColor,
-                selectedWeight: selectedWeight
+                selectedWeight: selectedWeight,
+                selectedActivationFunction: selectedActivationFunction
             }
         }, () => {
             if (toTogglePopover) {
@@ -293,6 +306,7 @@ class NeuralNetwork extends React.Component {
             const layer = this.findLayer(id, prevState);
 
             if (nn.layers[layer].nodes.length === 1) {
+                console.log('here');
                 alert("Cannot delete last node in input or output layer");
                 return {};
             }
@@ -312,11 +326,6 @@ class NeuralNetwork extends React.Component {
             nn.layers[layer].nodes.forEach((element, index) => {
                 nn.nodes[element].y = yValues[index];
             });
-
-            // selectedId: id,
-            // nodeSelected: isNode,
-            // selectedColor: selectedColor,
-            // selectedWeight: selectedWeight
 
             disablePopover(popover_id);
             this.popoverEnabled = false;
@@ -419,9 +428,10 @@ class NeuralNetwork extends React.Component {
                     {this.state.nodeSelected ?
                         <div>
                             <label htmlFor="activation-function">Activation Function: </label>
-                            <select name="activation-function">
-                                <option>Tan</option>
-                                <option>RELU</option>
+                            <select name="activation-selector" value={this.state.selectedActivationFunction} onChange={this.colorChange}>
+                                {activation_functions.map((fn, index) => {
+                                    return <option id={index} key={fn}>{fn}</option>;
+                                })}
                             </select>
                             {this.state.selectedId !== -1 &&
                                 <div>
