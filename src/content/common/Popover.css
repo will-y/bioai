@@ -39,6 +39,6 @@
     cursor: pointer;
 }
 
-select, input {
+.popover-container select, .popover-container input {
     margin-left: 10px;
 }
