@@ -26,13 +26,13 @@ class NeuralNetwork extends React.Component {
             selectedWeight: 0,
             selectedActivationFunction: -1,
             edgeIdCounter: 2,
-            nodeIdCounter: 3
+            nodeIdCounter: 3,
+            layerSize: 4
         }
 
         this.canvasRef = React.createRef();
         this.popoverEnabled = false;
         this.layers = 0;
-        this.layerSize = 4;
 
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
         this.colorChange = this.colorChange.bind(this);
@@ -121,7 +121,7 @@ class NeuralNetwork extends React.Component {
                 toReturn = {
                     selectedColor: value,
                     nn: nn
-                }
+                };
             } else if (name === "weight-selector") {
                 if (!this.state.nodeSelected) {
                     nn.edges[prevState.selectedId].w = value;
@@ -129,7 +129,7 @@ class NeuralNetwork extends React.Component {
                 toReturn = {
                     selectedWeight: value,
                     nn: nn
-                }
+                };
             } else if (name === "activation-selector") {
                 if (this.state.nodeSelected) {
                     nn.nodes[prevState.selectedId].activationFunction = value;
@@ -137,7 +137,11 @@ class NeuralNetwork extends React.Component {
                 toReturn = {
                     selectedActivationFunction: value,
                     nn: nn
-                }
+                };
+            } else {
+                toReturn = {
+                    [name]: value
+                };
             }
 
             return toReturn;
@@ -217,8 +221,8 @@ class NeuralNetwork extends React.Component {
 
             // add new nodes
             const newNodeIds = [];
-            const yValues = this.calculateNodeYValues(this.layerSize);
-            for (let i = 0; i < this.layerSize; i++) {
+            const yValues = this.calculateNodeYValues(this.state.layerSize);
+            for (let i = 0; i < this.state.layerSize; i++) {
 
                 nn.nodes[startingId++] = {x: starting_x + node_x_spacing * (this.layers + 1), y: yValues[i], color: node_default_color};
                 newNodeIds.push(startingId - 1);
@@ -471,6 +475,7 @@ class NeuralNetwork extends React.Component {
     }
 
     calculateNodeYValues(numNodes) {
+        numNodes = parseInt(numNodes);
         const height = this.state.height;
         const result = [];
 
@@ -498,6 +503,14 @@ class NeuralNetwork extends React.Component {
                 <div className="container">
                     <div className="row controls-container">
                         <button onClick={this.addLayer}>Add Layer</button>
+                        <label htmlFor="layerSize">Layer Size</label>
+                        <input type="number"
+                               name="layerSize"
+                               size={3}
+                               max={99}
+                               min={1}
+                               value={this.state.layerSize}
+                               onChange={this.colorChange}/>
                         <button onClick={this.removeInputNode}>-</button>
                         <label>Input</label>
                         <button onClick={this.addInputNode}>+</button>
