@@ -272,21 +272,21 @@ class NeuralNetwork extends React.Component {
                 // else output layer
                 if (layer === 0) {
                     if (this.layers === 0) {
-                        return nn.layers[1].nodes
+                        return nn.layers[1].nodes;
                     } else {
-                        return nn.layers[2].nodes
+                        return nn.layers[2].nodes;
                     }
                 } else if (layer === 1) {
                     if (this.layers === 0) {
                         return nn.layers[0].nodes;
                     } else {
-                        return nn.layers[this.layers + 1];
+                        return nn.layers[this.layers + 1].nodes;
                     }
                 } else {
                     if (nn.layers[layer + 1]) {
-                        return nn.layers[layer + 1]
+                        return nn.layers[layer + 1];
                     } else {
-                        return nn.layers[1].nodes
+                        return nn.layers[1].nodes;
                     }
                 }
             })();
