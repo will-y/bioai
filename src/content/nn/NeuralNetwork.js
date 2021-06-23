@@ -41,6 +41,7 @@ class NeuralNetwork extends React.Component {
         this.removeInputNode = this.removeInputNode.bind(this);
         this.removeNode = this.removeNode.bind(this);
         this.addOutputNode = this.addOutputNode.bind(this);
+        this.removeOutputNode = this.removeOutputNode.bind(this);
     }
 
     initializeNetwork(callback) {
@@ -325,6 +326,11 @@ class NeuralNetwork extends React.Component {
         this.removeNode(toRemove);
     }
 
+    removeOutputNode() {
+        const toRemove = this.state.nn.layers[1].nodes[this.state.nn.layers[1].nodes.length - 1];
+        this.removeNode(toRemove);
+    }
+
     removeNode(id) {
         let deletedLayer = false;
         this.setState(prevState => {
@@ -495,7 +501,7 @@ class NeuralNetwork extends React.Component {
                         <button onClick={this.removeInputNode}>-</button>
                         <label>Input</label>
                         <button onClick={this.addInputNode}>+</button>
-                        <button disabled onClick={this.removeOutputNode}>-</button>
+                        <button onClick={this.removeOutputNode}>-</button>
                         <label>Output</label>
                         <button onClick={this.addOutputNode}>+</button>
                     </div>
