@@ -40,6 +40,7 @@ class NeuralNetwork extends React.Component {
         this.addInputNode = this.addInputNode.bind(this);
         this.removeInputNode = this.removeInputNode.bind(this);
         this.removeNode = this.removeNode.bind(this);
+        this.addOutputNode = this.addOutputNode.bind(this);
     }
 
     initializeNetwork(callback) {
@@ -255,30 +256,68 @@ class NeuralNetwork extends React.Component {
         });
     }
 
-    addInputNode() {
+    addNode(layer) {
         this.setState(prevState => {
             const nn = JSON.parse(JSON.stringify(prevState.nn));
-            const id = this.state.nodeIdCounter;
-            const nodeIds = nn.layers[0].nodes;
+            const id = prevState.nodeIdCounter;
+            const nodeIds = nn.layers[layer].nodes;
             const layerIndex = nodeIds.length;
             const yValues = this.calculateNodeYValues(layerIndex + 1);
-            const nextLayerIds = this.layers === 0 ? nn.layers[1].nodes : nn.layers[2].nodes;
+            const xValue = nn.nodes[nn.layers[layer].nodes[0]].x;
+            const nextLayerIds = (() => {
+                // if starting layer and no layers, output layer
+                // if starting layer and layers, layer 2
+                // if other layer and layer + 1 exists, layer + 1
+                // else output layer
+                if (layer === 0) {
+                    if (this.layers === 0) {
+                        return nn.layers[1].nodes
+                    } else {
+                        return nn.layers[2].nodes
+                    }
+                } else if (layer === 1) {
+                    if (this.layers === 0) {
+                        return nn.layers[0].nodes;
+                    } else {
+                        return nn.layers[this.layers + 1];
+                    }
+                } else {
+                    if (nn.layers[layer + 1]) {
+                        return nn.layers[layer + 1]
+                    } else {
+                        return nn.layers[1].nodes
+                    }
+                }
+            })();
+
             let nextEdge = prevState.edgeIdCounter;
 
-            nn.nodes[id] = {x: starting_x, y: yValues[layerIndex], input: true, color: node_default_color}
+            nn.nodes[id] = {x: xValue, y: yValues[layerIndex], input: true, color: node_default_color};
 
             nodeIds.forEach((element, index) => {
-               nn.nodes[element].y = yValues[index];
+                nn.nodes[element].y = yValues[index];
             });
 
-            nn.layers[0].nodes.push(id);
+            nn.layers[layer].nodes.push(id);
 
             nextLayerIds.forEach(element => {
-                nn.edges[nextEdge++] = {n1: id, n2: element, color: edge_default_color, w: Math.random()}
+                if (layer === 1) {
+                    nn.edges[nextEdge++] = {n1: element, n2: id, color: edge_default_color, w: Math.random()};
+                } else {
+                    nn.edges[nextEdge++] = {n1: id, n2: element, color: edge_default_color, w: Math.random()};
+                }
             });
 
             return {nn: nn, edgeIdCounter: nextEdge, nodeIdCounter: id + 1};
         }, this.drawNeuralNetwork);
+    }
+
+    addInputNode() {
+        this.addNode(0);
+    }
+
+    addOutputNode() {
+        this.addNode(1);
     }
 
     removeInputNode() {
@@ -453,8 +492,12 @@ class NeuralNetwork extends React.Component {
                 <div className="container">
                     <div className="row controls-container">
                         <button onClick={this.addLayer}>Add Layer</button>
-                        <button onClick={this.addInputNode}>Add Input Node</button>
-                        <button onClick={this.removeInputNode}>Remove Input Node</button>
+                        <button onClick={this.removeInputNode}>-</button>
+                        <label>Input</label>
+                        <button onClick={this.addInputNode}>+</button>
+                        <button disabled onClick={this.removeOutputNode}>-</button>
+                        <label>Output</label>
+                        <button onClick={this.addOutputNode}>+</button>
                     </div>
                     <div className="row nn-canvas-container">
                         <canvas width={this.state.width} height={this.state.height} ref={this.canvasRef}
