@@ -110,7 +110,7 @@ class NeuralNetwork extends React.Component {
         const value = event.target.value;
         const name = event.target.name;
         let toReturn;
-        let needToUpdate = false;
+        let layerToUpdate = -1;
 
         this.setState((prevState) => {
             const nn = JSON.parse(JSON.stringify(prevState.nn));
@@ -126,8 +126,9 @@ class NeuralNetwork extends React.Component {
                     nn: nn
                 };
             } else if (name === "weight-selector") {
-                if (!this.state.nodeSelected) {
+                if (!prevState.nodeSelected) {
                     nn.edges[prevState.selectedId].w = value;
+                    layerToUpdate = this.layers === 0 ? 1 : nn.edges[prevState.selectedId].l + 1;
                 }
                 toReturn = {
                     selectedWeight: value,
@@ -143,11 +144,10 @@ class NeuralNetwork extends React.Component {
                 };
             } else {
                 if (name.includes("node")) {
-                    needToUpdate = true;
                     const nodeId = parseInt(event.target.id);
                     nn.nodes[nodeId].value = value;
 
-                    this.updateOutput(this.layers === 0 ? 1 : this.layers + 1, prevState, nn);
+                    layerToUpdate = this.layers === 0 ? 1 : 2;
                 }
 
                 toReturn = {
@@ -156,12 +156,13 @@ class NeuralNetwork extends React.Component {
                 };
             }
 
+            if (layerToUpdate !== -1) {
+                this.updateOutput(nn.layers[layerToUpdate] ? layerToUpdate: 0, prevState, nn);
+            }
+
             return toReturn;
         }, () => {
             this.drawNeuralNetwork();
-            if (needToUpdate) {
-
-            }
         });
     }
 
@@ -529,7 +530,6 @@ class NeuralNetwork extends React.Component {
 
             Object.values(nn.edges).forEach(edge => {
                 if (edge.n2 === node) {
-                    console.log('adding value ' + nn.nodes[edge.n1].value + " * " + edge.w);
                     newValue += nn.nodes[edge.n1].value * edge.w;
                 }
             });
