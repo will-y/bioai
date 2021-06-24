@@ -269,6 +269,8 @@ class NeuralNetwork extends React.Component {
             // add edges from the new layer to the output layer
             tempCounter = this.connectLayers(this.layers + 2, 1, nn, tempCounter);
 
+            this.updateOutput(this.layers + 2, prevState, nn);
+
             return {nn: nn, edgeIdCounter: tempCounter, nodeIdCounter: startingId};
 
         }, () => {
