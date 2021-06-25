@@ -237,7 +237,6 @@ class NeuralNetwork extends React.Component {
             const newNodeIds = [];
             const yValues = this.calculateNodeYValues(this.state.layerSize);
             for (let i = 0; i < this.state.layerSize; i++) {
-
                 nn.nodes[startingId++] = {x: starting_x + node_x_spacing * (this.layers + 1), y: yValues[i], color: node_default_color};
                 newNodeIds.push(startingId - 1);
             }
@@ -580,6 +579,7 @@ class NeuralNetwork extends React.Component {
                     </div>
                     {this.state.nn &&
                     <div className="row controls-container">
+                        <label>Input:</label>
                         {this.state.nn.layers[0].nodes.map(nodeId => {
                             return <input key={nodeId}
                                           id={nodeId}
@@ -590,6 +590,7 @@ class NeuralNetwork extends React.Component {
                                           onChange={this.colorChange}
                                           value={this.state[`node${nodeId}Input`]} />
                         })}
+                        <label>Output:</label>
                         {this.state.nn.layers[1].nodes.map(nodeId => {
                             return <div key={nodeId} className="output-value">{this.round(this.state.nn.nodes[nodeId].value, 3)}</div>
                         })}

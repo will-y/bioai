@@ -2,3 +2,9 @@
     border: 1px solid #4361A1;
     margin-top: 10px;
 }
+
+.output-value {
+    border: 1px solid #4361A1;
+    padding: 2px;
+    margin-left: 5px;
+}
