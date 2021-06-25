@@ -424,12 +424,16 @@ class NeuralNetwork extends React.Component {
                 }
             }
 
-            disablePopover(popover_id);
-            this.popoverEnabled = false;
+            if (prevState.selectedId && parseInt(prevState.selectedId) === id) {
+                disablePopover(popover_id);
+                this.popoverEnabled = false;
+            }
+
+            this.updateOutput(layer, prevState, nn);
 
             return {
                 nn: nn,
-                selectedId: -1,
+                selectedId: parseInt(prevState.selectedId) === id ? -1 : parseInt(prevState.selectedId),
                 edgeIdCounter: edgeCounter
             };
         }, () => {
@@ -532,16 +536,19 @@ class NeuralNetwork extends React.Component {
     nn will be updated to the correct values
      */
     updateOutput(startingLayer, state, nn) {
-        nn.layers[startingLayer].nodes.forEach(node => {
-            let newValue = 0;
+        // really gotta do something about this string number bs
+        if (startingLayer !== 0 && startingLayer !== "0") {
+            nn.layers[startingLayer].nodes.forEach(node => {
+                let newValue = 0;
 
-            Object.values(nn.edges).forEach(edge => {
-                if (edge.n2 === node) {
-                    newValue += nn.nodes[edge.n1].value * edge.w;
-                }
+                Object.values(nn.edges).forEach(edge => {
+                    if (edge.n2 === node) {
+                        newValue += nn.nodes[edge.n1].value * edge.w;
+                    }
+                });
+                nn.nodes[node].value = newValue;
             });
-            nn.nodes[node].value = newValue;
-        });
+        }
 
         if (startingLayer !== 1) {
             const layer = this.getNextLayer(startingLayer, nn);
