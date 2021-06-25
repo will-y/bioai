@@ -227,13 +227,11 @@ class NeuralNetwork extends React.Component {
             let tempCounter = prevState.edgeIdCounter;
 
             // move output nodes out and mark the ids of output nodes
-            const outputIds = [];
-            for (let i = 0; i < startingId; i++) {
-                if (nn.nodes[i] && nn.nodes[i].output) {
-                    nn.nodes[i].x += node_x_spacing;
-                    outputIds.push(i);
-                }
-            }
+            const outputIds = nn.layers[1].nodes;
+
+            outputIds.forEach(element => {
+                nn.nodes[element].x += node_x_spacing;
+            });
 
             // add new nodes
             const newNodeIds = [];
@@ -526,7 +524,7 @@ class NeuralNetwork extends React.Component {
     }
 
     getRandomWeight() {
-        return Math.round((Math.random() + Number.EPSILON) * 1000) / 1000;
+        return this.round(Math.random(), 3);
     }
 
     /*
@@ -553,6 +551,10 @@ class NeuralNetwork extends React.Component {
             const layer = this.getNextLayer(startingLayer, nn);
             this.updateOutput(layer, nn);
         }
+    }
+
+    round(num, decimals) {
+        return Math.round((num + Number.EPSILON) * 10**decimals) / 10**decimals;
     }
 
     render() {
@@ -589,7 +591,7 @@ class NeuralNetwork extends React.Component {
                                           value={this.state[`node${nodeId}Input`]} />
                         })}
                         {this.state.nn.layers[1].nodes.map(nodeId => {
-                            return <div key={nodeId} className="output-value">{this.state.nn.nodes[nodeId].value}</div>
+                            return <div key={nodeId} className="output-value">{this.round(this.state.nn.nodes[nodeId].value, 3)}</div>
                         })}
                     </div>}
                     <div className="row nn-canvas-container">
@@ -615,7 +617,7 @@ class NeuralNetwork extends React.Component {
                                 <div>
                                     <p>X: {this.state.nn.nodes[this.state.selectedId].x}</p>
                                     <p>Y: {this.state.nn.nodes[this.state.selectedId].y}</p>
-                                    <p>Value: {this.state.nn.nodes[this.state.selectedId].value}</p>
+                                    <p>Value: {this.round(this.state.nn.nodes[this.state.selectedId].value, 3)}</p>
                                 </div>
                             }
                             <button className="btn btn-danger" onClick={() => this.removeNode(parseInt(this.state.selectedId))}>Delete</button>
