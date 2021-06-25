@@ -157,7 +157,7 @@ class NeuralNetwork extends React.Component {
             }
 
             if (layerToUpdate !== -1) {
-                this.updateOutput(nn.layers[layerToUpdate] ? layerToUpdate: 0, prevState, nn);
+                this.updateOutput(nn.layers[layerToUpdate] ? layerToUpdate: 0, nn);
             }
 
             return toReturn;
@@ -269,7 +269,7 @@ class NeuralNetwork extends React.Component {
             // add edges from the new layer to the output layer
             tempCounter = this.connectLayers(this.layers + 2, 1, nn, tempCounter);
 
-            this.updateOutput(this.layers + 2, prevState, nn);
+            this.updateOutput(this.layers + 2, nn);
 
             return {nn: nn, edgeIdCounter: tempCounter, nodeIdCounter: startingId};
 
@@ -291,7 +291,7 @@ class NeuralNetwork extends React.Component {
 
             let nextEdge = prevState.edgeIdCounter;
 
-            nn.nodes[id] = {x: xValue, y: yValues[layerIndex], input: true, color: node_default_color};
+            nn.nodes[id] = {x: xValue, y: yValues[layerIndex], input: layer === 0, color: node_default_color, value: 0};
 
             nodeIds.forEach((element, index) => {
                 nn.nodes[element].y = yValues[index];
@@ -308,7 +308,7 @@ class NeuralNetwork extends React.Component {
             });
 
             if (updateOutput) {
-                this.updateOutput(layer, prevState, nn);
+                this.updateOutput(layer, nn);
             }
 
             return {nn: nn, edgeIdCounter: nextEdge, nodeIdCounter: id + 1, ...extraStates};
@@ -344,7 +344,6 @@ class NeuralNetwork extends React.Component {
     addInputNode() {
         const id = this.state.nodeIdCounter;
         this.addNode(0, {[`node${id}Input`]: 0}, true);
-
     }
 
     addOutputNode() {
@@ -429,7 +428,7 @@ class NeuralNetwork extends React.Component {
                 this.popoverEnabled = false;
             }
 
-            this.updateOutput(layer, prevState, nn);
+            this.updateOutput(layer, nn);
 
             return {
                 nn: nn,
@@ -535,7 +534,7 @@ class NeuralNetwork extends React.Component {
     the first layer with to be updated should be passed in startingLayer
     nn will be updated to the correct values
      */
-    updateOutput(startingLayer, state, nn) {
+    updateOutput(startingLayer, nn) {
         // really gotta do something about this string number bs
         if (startingLayer !== 0 && startingLayer !== "0") {
             nn.layers[startingLayer].nodes.forEach(node => {
@@ -552,7 +551,7 @@ class NeuralNetwork extends React.Component {
 
         if (startingLayer !== 1) {
             const layer = this.getNextLayer(startingLayer, nn);
-            this.updateOutput(layer, state, nn);
+            this.updateOutput(layer, nn);
         }
     }
 
@@ -588,6 +587,9 @@ class NeuralNetwork extends React.Component {
                                           name={`node${nodeId}Input`}
                                           onChange={this.colorChange}
                                           value={this.state[`node${nodeId}Input`]} />
+                        })}
+                        {this.state.nn.layers[1].nodes.map(nodeId => {
+                            return <div key={nodeId} className="output-value">{this.state.nn.nodes[nodeId].value}</div>
                         })}
                     </div>}
                     <div className="row nn-canvas-container">
