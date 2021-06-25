@@ -279,7 +279,7 @@ class NeuralNetwork extends React.Component {
         });
     }
 
-    addNode(layer, extraStates={}) {
+    addNode(layer, extraStates={}, updateOutput=false) {
         this.setState(prevState => {
             const nn = JSON.parse(JSON.stringify(prevState.nn));
             const id = prevState.nodeIdCounter;
@@ -306,6 +306,10 @@ class NeuralNetwork extends React.Component {
                     nn.edges[nextEdge++] = {n1: id, n2: element, l: layer, color: edge_default_color, w: this.getRandomWeight()};
                 }
             });
+
+            if (updateOutput) {
+                this.updateOutput(layer, prevState, nn);
+            }
 
             return {nn: nn, edgeIdCounter: nextEdge, nodeIdCounter: id + 1, ...extraStates};
         }, this.drawNeuralNetwork);
@@ -339,11 +343,12 @@ class NeuralNetwork extends React.Component {
 
     addInputNode() {
         const id = this.state.nodeIdCounter;
-        this.addNode(0, {[`node${id}Input`]: 0});
+        this.addNode(0, {[`node${id}Input`]: 0}, true);
+
     }
 
     addOutputNode() {
-        this.addNode(1);
+        this.addNode(1, {}, true);
     }
 
     removeInputNode() {
