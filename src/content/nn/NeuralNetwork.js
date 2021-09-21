@@ -8,15 +8,15 @@ const node_radius = 20;
 const max_node_difference = 200;
 const node_x_spacing = 150;
 const starting_x = 50;
-const node_default_color = "#008000";
-const edge_default_color = "#FFA500";
+const node_default_color = "#4361A1";
+const edge_default_color = "#4afd06";
+const edge_negative_default_color = "#ef0202";
+
 const popover_id = "node-edge-info";
 // use this: https://www.analyticsvidhya.com/blog/2020/01/fundamentals-deep-learning-activation-functions-when-to-use-them/
-// TODO: Implement these and then apply the activation functions to the nodes. Remember to update the network
-//  starting at this layer
 const activation_functions_list = ["None", "Binary Step", "Linear", "Sigmoid", "Tanh", "ReLU", "Leaky ReLU", "ELU", "Swish"];
 
-// activation functions that require a parmeter
+// activation functions that require a parameter
 const parameterized_activation_functions = ["Linear", "ELU"];
 
 const activation_functions = {
@@ -69,11 +69,14 @@ class NeuralNetwork extends React.Component {
 
     initializeNetwork(callback) {
         this.setState(() => {
+            const w1 = this.getRandomWeight();
+            const w2 = this.getRandomWeight();
+
             const nn = {
                 nodes: {},
                 edges: {
-                    0: {n1: 0, n2: 2, l: 0, w: this.getRandomWeight(), color: edge_default_color},
-                    1: {n1: 1, n2: 2, l: 0, w: this.getRandomWeight(), color: edge_default_color}
+                    0: {n1: 0, n2: 2, l: 0, w: w1, color: w1 > 0 ? edge_default_color : edge_negative_default_color},
+                    1: {n1: 1, n2: 2, l: 0, w: w2, color: w2 > 0 ? edge_default_color : edge_negative_default_color}
                 },
                 layers: {
                     0: {input: true, nodes: [0, 1]},
@@ -83,9 +86,9 @@ class NeuralNetwork extends React.Component {
             const yValues = this.calculateNodeYValues(2);
 
             nn.nodes = {
-                0: {x: starting_x, y: yValues[0], input: true, color: node_default_color, activationFunction: activation_functions_list[0], value: 0},
-                1: {x: starting_x, y: yValues[1], input: true, color: node_default_color, activationFunction: activation_functions_list[0], value: 0},
-                2: {x: starting_x + node_x_spacing, y: this.calculateNodeYValues(1)[0], output: true, color: node_default_color, activationFunction: activation_functions_list[0], value: 0}
+                0: {x: starting_x, y: yValues[0], input: true, color: node_default_color, activationFunction: activation_functions_list[0], value: 0, activationParameter: 0},
+                1: {x: starting_x, y: yValues[1], input: true, color: node_default_color, activationFunction: activation_functions_list[0], value: 0, activationParameter: 0},
+                2: {x: starting_x + node_x_spacing, y: this.calculateNodeYValues(1)[0], output: true, color: node_default_color, activationFunction: activation_functions_list[0], value: 0,  activationParameter: 0}
             }
 
             return {nn: nn};
@@ -158,14 +161,16 @@ class NeuralNetwork extends React.Component {
             } else if (name === "activation-selector") {
                 if (this.state.nodeSelected) {
                     nn.nodes[prevState.selectedId].activationFunction = value;
+                    layerToUpdate = this.layers === 0 ? 1 : 2;
                 }
                 toReturn = {
                     selectedActivationFunction: value,
                     nn: nn
                 };
             } else if (name === "activation-parameter") {
-                if (this.state.activationParameter) {
-                    nn.nodes[prevState.selectedId].activationParameter = value;
+                if (this.state.nodeSelected) {
+                    nn.nodes[prevState.selectedId].activationParameter = parseFloat(value);
+                    layerToUpdate = this.layers === 0 ? 1 : 2;
                 }
 
                 toReturn = {
@@ -176,7 +181,7 @@ class NeuralNetwork extends React.Component {
             } else {
                 if (name.includes("node")) {
                     const nodeId = parseInt(event.target.id);
-                    nn.nodes[nodeId].value = value;
+                    nn.nodes[nodeId].value = parseFloat(value);
 
                     layerToUpdate = this.layers === 0 ? 1 : 2;
                 }
@@ -222,7 +227,7 @@ class NeuralNetwork extends React.Component {
             const dist = this.distanceToLine(n1.x, n1.y, n2.x, n2.y, x, y);
 
             if (((n1.x < x && x < n2.x) || (n2.x < x && x < n1.x))
-                && (dist <= 5)) {
+                && (dist <= 10)) {
                 return edgeId;
             }
         }
@@ -236,13 +241,15 @@ class NeuralNetwork extends React.Component {
             const selectedColor = isNode ? prevState.nn.nodes[id].color : prevState.nn.edges[id].color;
             const selectedWeight = isNode ? 0 : prevState.nn.edges[id].w;
             const selectedActivationFunction = isNode ? prevState.nn.nodes[id].activationFunction : -1;
+            const selectedActivationParameter = isNode ? prevState.nn.nodes[id].activationParameter: -1;
 
             return {
                 selectedId: id,
                 nodeSelected: isNode,
                 selectedColor: selectedColor,
                 selectedWeight: selectedWeight,
-                selectedActivationFunction: selectedActivationFunction
+                selectedActivationFunction: selectedActivationFunction,
+                activationParameter: selectedActivationParameter
             }
         }, () => {
             if (toTogglePopover) {
@@ -268,7 +275,7 @@ class NeuralNetwork extends React.Component {
             const newNodeIds = [];
             const yValues = this.calculateNodeYValues(this.state.layerSize);
             for (let i = 0; i < this.state.layerSize; i++) {
-                nn.nodes[startingId++] = {x: starting_x + node_x_spacing * (this.layers + 1), y: yValues[i], color: node_default_color};
+                nn.nodes[startingId++] = {x: starting_x + node_x_spacing * (this.layers + 1), y: yValues[i], color: node_default_color, activationFunction: activation_functions_list[0], activationParameter: 0};
                 newNodeIds.push(startingId - 1);
             }
 
@@ -319,7 +326,7 @@ class NeuralNetwork extends React.Component {
 
             let nextEdge = prevState.edgeIdCounter;
 
-            nn.nodes[id] = {x: xValue, y: yValues[layerIndex], input: layer === 0, color: node_default_color, value: 0};
+            nn.nodes[id] = {x: xValue, y: yValues[layerIndex], input: layer === 0, color: node_default_color, value: 0, activationFunction: activation_functions_list[0], activationParameter: 0};
 
             nodeIds.forEach((element, index) => {
                 nn.nodes[element].y = yValues[index];
@@ -478,7 +485,9 @@ class NeuralNetwork extends React.Component {
 
         nn.layers[layer1].nodes.forEach(layer1Node => {
             nn.layers[layer2].nodes.forEach(layer2Node => {
-                nn.edges[edgeCounter++] = {n1: layer1Node, n2: layer2Node, l: layer1, w: this.getRandomWeight(), color: edge_default_color}
+                const weight = this.getRandomWeight();
+                // TODO: default edges aren't colored right
+                nn.edges[edgeCounter++] = {n1: layer1Node, n2: layer2Node, l: layer1, w: weight, color: weight >= 0 ? edge_default_color : edge_negative_default_color}
             });
         });
 
@@ -559,7 +568,7 @@ class NeuralNetwork extends React.Component {
 
     /*
     updates all of the nodes
-    the first layer with to be updated should be passed in startingLayer
+    the first layer to be updated should be passed in startingLayer
     nn will be updated to the correct values
      */
     updateOutput(startingLayer, nn) {
@@ -573,13 +582,30 @@ class NeuralNetwork extends React.Component {
                         newValue += nn.nodes[edge.n1].value * edge.w;
                     }
                 });
-                nn.nodes[node].value = newValue;
+
+                nn.nodes[node].value = this.applyActivationFunction(nn.nodes[node].activationFunction, newValue, nn.nodes[node].activationParameter);
             });
         }
 
         if (startingLayer !== 1) {
             const layer = this.getNextLayer(startingLayer, nn);
             this.updateOutput(layer, nn);
+        }
+    }
+
+    applyActivationFunction(activationFunction, value, parameter) {
+        const func = activation_functions[activationFunction];
+
+        // just default to no activation function
+        if (!func) {
+            console.error("bad activation function: " + activationFunction);
+            return value
+        }
+
+        if (parameterized_activation_functions.includes(activationFunction)) {
+            return func(value, parameter);
+        } else {
+            return func(value);
         }
     }
 
@@ -660,7 +686,6 @@ class NeuralNetwork extends React.Component {
                         <div>
                             <label htmlFor="weight-selector">Weight: </label>
                             <input name="weight-selector" type="number" value={this.state.selectedWeight} onChange={this.colorChange} step={0.001}/>
-                            {this.state.nn && this.state.nn.edges[this.state.selectedId] && <p>{this.state.nn.edges[this.state.selectedId].l}</p>}
                         </div>}
                 </Popover>
             </div>
