@@ -617,6 +617,9 @@ class NeuralNetwork extends React.Component {
         return (
             <div>
                 <div className="container">
+                    <div className="row">
+                        <p className="note-text">This page is not completely done, some things might not work.</p>
+                    </div>
                     <div className="row controls-container">
                         <button onClick={this.addLayer}>Add Layer</button>
                         <label htmlFor="layerSize">Layer Size</label>

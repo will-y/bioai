@@ -43,6 +43,13 @@ class Home extends React.Component {
                             </div>
                         </Link>
                     </div>
+                    <div className="contact-wrapper">
+                        <Link className="contact" to="/nn">
+                            <div className="contact-content">
+                                <p className="contact-text">Neural Networks</p>
+                            </div>
+                        </Link>
+                    </div>
                 </div>
             </div>
         );
