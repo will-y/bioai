@@ -21,6 +21,7 @@ class GameOfLifePopover extends React.Component {
                     <li>Press Step to go forward one step.</li>
                     <li>Press Reset to clear the board.</li>
                     <li>Use the speed slider to change the speed of the simulation.</li>
+                    <li>Select presets in the dropdown and then press Load Presets to see some cool patterns.</li>
                 </ol>
                 <p>You can also click on any square in the simulation at any time to toggle its state.</p>
                 <h3>Cool Patterns</h3>
