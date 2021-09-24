@@ -5,9 +5,10 @@ import Popover from "../common/Popover";
 import GameOfLifePopover from "./GameOfLifePopover";
 import PopoverToggle from "../common/PopoverToggle";
 import Timer from "../common/Timer";
+import presets from "./data/presets.json";
 
 const gridCount = 50;
-const gridSize = 13;
+const gridSize = 15;
 const fillProbability = 0.35;
 const neighborArray = [-1, 0, 1];
 const liveColor = "#5beb42";
@@ -21,7 +22,8 @@ class GameOfLife extends React.Component {
         this.gameState = this.getInitialGameState();
 
         this.state = {
-            speed: 100
+            speed: 100,
+            preset: ""
         }
         const t = this;
         this.timer = new Timer(() => {
@@ -176,6 +178,20 @@ class GameOfLife extends React.Component {
         this.displayGrid();
     }
 
+    loadPreset = () => {
+        if (this.state.preset === "") {
+            this.gameState = this.getInitialGameState();
+        } else {
+            this.gameState = presets[this.state.preset];
+        }
+        this.displayGrid();
+        this.valid = true;
+    }
+
+    printGameStateJSON = () => {
+        console.log(JSON.stringify(this.gameState));
+    }
+
     render() {
         return (
             <div className={"ca-container"}>
@@ -184,6 +200,16 @@ class GameOfLife extends React.Component {
                     <button id="start-game-of-life" onClick={this.start}>Play</button>
                     <button id="step-game-of-life" onClick={this.step}>Step</button>
                     <button onClick={this.reset}>Reset</button>
+                    {/*<button onClick={this.printGameStateJSON}>Print</button>*/}
+                    {/*<button onClick={this.loadPreset}>Load</button>*/}
+                    <select value={this.state.preset} onChange={this.handleInputChange} name="preset">
+                        <option disabled hidden value="">Select Preset</option>
+                        <option value="still">Still Examples</option>
+                        <option value="glider">Glider</option>
+                        <option value="oscillators">Oscillators</option>
+                        <option value="gliderGun">Glider Gun</option>
+                    </select>
+                    <button onClick={this.loadPreset}>Load Preset</button>
                     <PopoverToggle text="Info" toToggle="gol-popover"/>
                     <label htmlFor="speed">Speed: </label>
                     <input type="range"
