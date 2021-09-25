@@ -50,7 +50,8 @@ class NeuralNetwork extends React.Component {
             layerSize: 4,
             node0Input: 0,
             node1Input: 0,
-            activationParameter: 0
+            activationParameter: 0,
+            selectedBias: 0
         }
 
         this.canvasRef = React.createRef();
@@ -88,7 +89,7 @@ class NeuralNetwork extends React.Component {
             nn.nodes = {
                 0: {x: starting_x, y: yValues[0], input: true, color: node_default_color, activationFunction: activation_functions_list[0], value: 0, activationParameter: 0},
                 1: {x: starting_x, y: yValues[1], input: true, color: node_default_color, activationFunction: activation_functions_list[0], value: 0, activationParameter: 0},
-                2: {x: starting_x + node_x_spacing, y: this.calculateNodeYValues(1)[0], output: true, color: node_default_color, activationFunction: activation_functions_list[0], value: 0,  activationParameter: 0}
+                2: {x: starting_x + node_x_spacing, y: this.calculateNodeYValues(1)[0], output: true, color: node_default_color, activationFunction: activation_functions_list[0], value: 0,  activationParameter: 0, bias: 0}
             }
 
             return {nn: nn};
@@ -130,6 +131,7 @@ class NeuralNetwork extends React.Component {
         }
     }
 
+    // TODO this could use some cleanup
     handleInputChange(event) {
         const value = event.target.value;
         const name = event.target.name;
@@ -178,6 +180,16 @@ class NeuralNetwork extends React.Component {
                     nn: nn
                 }
 
+            } else if (name === "bias") {
+                if (this.state.nodeSelected) {
+                    nn.nodes[prevState.selectedId].bias = parseFloat(value);
+                    layerToUpdate = this.layers === 0 ? 1 : 2;
+                }
+
+                toReturn = {
+                    selectedBias: value,
+                    nn: nn
+                }
             } else {
                 if (name.includes("node")) {
                     const nodeId = parseInt(event.target.id);
@@ -241,7 +253,8 @@ class NeuralNetwork extends React.Component {
             const selectedColor = isNode ? prevState.nn.nodes[id].color : prevState.nn.edges[id].color;
             const selectedWeight = isNode ? 0 : prevState.nn.edges[id].w;
             const selectedActivationFunction = isNode ? prevState.nn.nodes[id].activationFunction : -1;
-            const selectedActivationParameter = isNode ? prevState.nn.nodes[id].activationParameter: -1;
+            const selectedActivationParameter = isNode ? prevState.nn.nodes[id].activationParameter : -1;
+            const selectedBias = isNode ? prevState.nn.nodes[id].bias : -1;
 
             return {
                 selectedId: id,
@@ -249,7 +262,8 @@ class NeuralNetwork extends React.Component {
                 selectedColor: selectedColor,
                 selectedWeight: selectedWeight,
                 selectedActivationFunction: selectedActivationFunction,
-                activationParameter: selectedActivationParameter
+                activationParameter: selectedActivationParameter,
+                selectedBias: selectedBias
             }
         }, () => {
             if (toTogglePopover) {
@@ -275,7 +289,7 @@ class NeuralNetwork extends React.Component {
             const newNodeIds = [];
             const yValues = this.calculateNodeYValues(this.state.layerSize);
             for (let i = 0; i < this.state.layerSize; i++) {
-                nn.nodes[startingId++] = {x: starting_x + node_x_spacing * (this.layers + 1), y: yValues[i], color: node_default_color, activationFunction: activation_functions_list[0], activationParameter: 0};
+                nn.nodes[startingId++] = {x: starting_x + node_x_spacing * (this.layers + 1), y: yValues[i], color: node_default_color, activationFunction: activation_functions_list[0], activationParameter: 0, bias: 0};
                 newNodeIds.push(startingId - 1);
             }
 
@@ -326,7 +340,7 @@ class NeuralNetwork extends React.Component {
 
             let nextEdge = prevState.edgeIdCounter;
 
-            nn.nodes[id] = {x: xValue, y: yValues[layerIndex], input: layer === 0, color: node_default_color, value: 0, activationFunction: activation_functions_list[0], activationParameter: 0};
+            nn.nodes[id] = {x: xValue, y: yValues[layerIndex], input: layer === 0, color: node_default_color, value: 0, activationFunction: activation_functions_list[0], activationParameter: 0, bias: 0};
 
             nodeIds.forEach((element, index) => {
                 nn.nodes[element].y = yValues[index];
@@ -486,7 +500,6 @@ class NeuralNetwork extends React.Component {
         nn.layers[layer1].nodes.forEach(layer1Node => {
             nn.layers[layer2].nodes.forEach(layer2Node => {
                 const weight = this.getRandomWeight();
-                // TODO: default edges aren't colored right
                 nn.edges[edgeCounter++] = {n1: layer1Node, n2: layer2Node, l: layer1, w: weight, color: weight >= 0 ? edge_default_color : edge_negative_default_color}
             });
         });
@@ -583,7 +596,7 @@ class NeuralNetwork extends React.Component {
                     }
                 });
 
-                nn.nodes[node].value = this.applyActivationFunction(nn.nodes[node].activationFunction, newValue, nn.nodes[node].activationParameter);
+                nn.nodes[node].value = this.applyActivationFunction(nn.nodes[node].activationFunction, newValue, nn.nodes[node].activationParameter) + nn.nodes[node].bias;
             });
         }
 
@@ -676,6 +689,12 @@ class NeuralNetwork extends React.Component {
                             </select>
                             {parameterized_activation_functions.includes(this.state.selectedActivationFunction) &&
                                 <input name="activation-parameter" type="number" value={this.state.activationParameter} onChange={this.handleInputChange} step={0.001} />
+                            }
+                            {!this.state.nn.nodes[this.state.selectedId].input &&
+                                <div>
+                                    <label htmlFor="bias">Bias: </label>
+                                    <input name="bias" type="number" value={this.state.selectedBias} onChange={this.handleInputChange} step={0.01} />
+                                </div>
                             }
                             {this.state.selectedId !== -1 &&
                                 <div>
