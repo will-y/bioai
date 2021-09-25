@@ -5,12 +5,14 @@ import Popover from "../common/Popover";
 import {disablePopover, togglePopover} from "../common/PopoverUtilities";
 
 const node_radius = 20;
+const selection_outline_radius = 2;
 const max_node_difference = 200;
 const node_x_spacing = 150;
 const starting_x = 50;
 const node_default_color = "#4361A1";
 const edge_default_color = "#4afd06";
 const edge_negative_default_color = "#ef0202";
+const outline_color = "#000000";
 
 const popover_id = "node-edge-info";
 // use this: https://www.analyticsvidhya.com/blog/2020/01/fundamentals-deep-learning-activation-functions-when-to-use-them/
@@ -122,11 +124,11 @@ class NeuralNetwork extends React.Component {
         const clickPos = this.getMousePosition(this.canvasRef.current, e);
         const nodeClicked = this.detectClickNode(clickPos[0], clickPos[1]);
         if (nodeClicked !== -1) {
-            this.handleClickNode(nodeClicked, true);
+            this.handleClickObject(nodeClicked, true);
         } else {
             const edgeClicked = this.detectClickEdge(clickPos[0], clickPos[1]);
             if (edgeClicked !== -1) {
-                this.handleClickNode(edgeClicked, false);
+                this.handleClickObject(edgeClicked, false);
             }
         }
     }
@@ -246,7 +248,7 @@ class NeuralNetwork extends React.Component {
         return -1;
     }
 
-    handleClickNode(id, isNode) {
+    handleClickObject(id, isNode) {
         const toTogglePopover = this.popoverEnabled || this.state.selectedId === -1 || (id === this.state.selectedId && this.state.nodeSelected === isNode);
 
         this.setState((prevState) => {
@@ -269,6 +271,7 @@ class NeuralNetwork extends React.Component {
             if (toTogglePopover) {
                 this.popoverEnabled = togglePopover(popover_id);
             }
+            this.drawNeuralNetwork();
         });
     }
 
@@ -529,7 +532,22 @@ class NeuralNetwork extends React.Component {
             const n1 = nodes[edge.n1];
             const n2 = nodes[edge.n2];
 
+
+
+            // if it is selected, outline it
+            if (!this.state.nodeSelected && id === this.state.selectedId) {
+                this.ctx.beginPath();
+                this.ctx.strokeStyle = outline_color;
+                this.ctx.lineWidth = Math.abs(edge.w) * 5 + selection_outline_radius * 2;
+
+                this.ctx.moveTo(n1.x, n1.y);
+                this.ctx.lineTo(n2.x, n2.y);
+
+                this.ctx.stroke();
+            }
+
             this.ctx.beginPath();
+
             this.ctx.strokeStyle = edge.color;
             this.ctx.lineWidth = Math.abs(edge.w) * 5;
 
@@ -547,6 +565,15 @@ class NeuralNetwork extends React.Component {
     drawNode(nodeIndex) {
         const node = this.state.nn.nodes[nodeIndex];
 
+        // draw outline to indicate that this node is selected
+        if (this.state.nodeSelected && this.state.selectedId === nodeIndex) {
+            this.ctx.beginPath();
+            this.ctx.fillStyle = outline_color;
+            this.ctx.arc(node.x, node.y, node_radius + selection_outline_radius, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+
+        // draw node
         this.ctx.beginPath();
         this.ctx.fillStyle = node.color;
         this.ctx.arc(node.x, node.y, node_radius, 0, Math.PI * 2);
