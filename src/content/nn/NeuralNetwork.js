@@ -59,18 +59,9 @@ class NeuralNetwork extends React.Component {
         this.canvasRef = React.createRef();
         this.popoverEnabled = false;
         this.layers = 0;
-
-        this.handleCanvasClick = this.handleCanvasClick.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.addLayer = this.addLayer.bind(this);
-        this.addInputNode = this.addInputNode.bind(this);
-        this.removeInputNode = this.removeInputNode.bind(this);
-        this.removeNode = this.removeNode.bind(this);
-        this.addOutputNode = this.addOutputNode.bind(this);
-        this.removeOutputNode = this.removeOutputNode.bind(this);
     }
 
-    initializeNetwork(callback) {
+    initializeNetwork = callback => {
         this.setState(() => {
             const w1 = this.getRandomWeight();
             const w2 = this.getRandomWeight();
@@ -98,29 +89,29 @@ class NeuralNetwork extends React.Component {
         }, callback);
     }
 
-    componentDidMount() {
+    componentDidMount = () => {
         this.ctx = this.canvasRef.current.getContext('2d');
         this.initializeNetwork(this.drawNeuralNetwork);
     }
 
-    distance(x1, y1, x2, y2) {
+    distance = (x1, y1, x2, y2) => {
         return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
     }
 
     // distance of point (px, py) from the line that passes through the points (x1, y1) and (x2, y2).
-    distanceToLine(x1, y1, x2, y2, px, py) {
+    distanceToLine = (x1, y1, x2, y2, px, py) => {
         return y1 === y2 ? Math.abs(py - y1) : Math.abs((x2 - x1) * (y1 - py) - (x1 - px) * (y2 - y1)) / (Math.sqrt((x2 - x2) ** 2 + (y2 - y1) ** 2));
     }
 
     // got this from https://www.geeksforgeeks.org/how-to-get-the-coordinates-of-a-mouse-click-on-a-canvas-element/
-    getMousePosition(canvas, event) {
+    getMousePosition = (canvas, event) => {
         let rect = canvas.getBoundingClientRect();
         let x = event.clientX - rect.left;
         let y = event.clientY - rect.top;
         return [x, y];
     }
 
-    handleCanvasClick(e) {
+    handleCanvasClick = e => {
         const clickPos = this.getMousePosition(this.canvasRef.current, e);
         const nodeClicked = this.detectClickNode(clickPos[0], clickPos[1]);
         if (nodeClicked !== -1) {
@@ -134,7 +125,7 @@ class NeuralNetwork extends React.Component {
     }
 
     // TODO this could use some cleanup
-    handleInputChange(event) {
+    handleInputChange = event => {
         const value = event.target.value;
         const name = event.target.name;
         let toReturn;
@@ -216,7 +207,7 @@ class NeuralNetwork extends React.Component {
         });
     }
 
-    detectClickNode(x, y) {
+    detectClickNode = (x, y) => {
         const nodes = this.state.nn.nodes;
 
         for (const nodeId in nodes) {
@@ -229,7 +220,7 @@ class NeuralNetwork extends React.Component {
         return -1;
     }
 
-    detectClickEdge(x, y) {
+    detectClickEdge = (x, y) => {
         const edges = this.state.nn.edges;
         const nodes = this.state.nn.nodes;
 
@@ -248,7 +239,7 @@ class NeuralNetwork extends React.Component {
         return -1;
     }
 
-    handleClickObject(id, isNode) {
+    handleClickObject = (id, isNode) => {
         const toTogglePopover = this.popoverEnabled || this.state.selectedId === -1 || (id === this.state.selectedId && this.state.nodeSelected === isNode);
 
         this.setState((prevState) => {
@@ -275,7 +266,7 @@ class NeuralNetwork extends React.Component {
         });
     }
 
-    addLayer() {
+    addLayer = () => {
         this.setState(prevState => {
             const nn = JSON.parse(JSON.stringify(prevState.nn));
             let startingId = this.state.nodeIdCounter;
@@ -331,7 +322,7 @@ class NeuralNetwork extends React.Component {
         });
     }
 
-    addNode(layer, extraStates={}, updateOutput=false) {
+    addNode = (layer, extraStates={}, updateOutput=false) => {
         this.setState(prevState => {
             const nn = JSON.parse(JSON.stringify(prevState.nn));
             const id = prevState.nodeIdCounter;
@@ -367,7 +358,7 @@ class NeuralNetwork extends React.Component {
         }, this.drawNeuralNetwork);
     }
 
-    getNextLayer(currentLayer, nn) {
+    getNextLayer = (currentLayer, nn) => {
         // if starting layer and no layers, output layer
         // if starting layer and layers, layer 2
         // if other layer and layer + 1 exists, layer + 1
@@ -393,26 +384,26 @@ class NeuralNetwork extends React.Component {
         }
     }
 
-    addInputNode() {
+    addInputNode = () => {
         const id = this.state.nodeIdCounter;
         this.addNode(0, {[`node${id}Input`]: 0}, true);
     }
 
-    addOutputNode() {
+    addOutputNode = () => {
         this.addNode(1, {}, true);
     }
 
-    removeInputNode() {
+    removeInputNode = () => {
         const toRemove = this.state.nn.layers[0].nodes[this.state.nn.layers[0].nodes.length - 1];
         this.removeNode(toRemove);
     }
 
-    removeOutputNode() {
+    removeOutputNode = () => {
         const toRemove = this.state.nn.layers[1].nodes[this.state.nn.layers[1].nodes.length - 1];
         this.removeNode(toRemove);
     }
 
-    removeNode(id) {
+    removeNode = id => {
         let deletedLayer = false;
         this.setState(prevState => {
             const nn = JSON.parse(JSON.stringify(prevState.nn));
@@ -497,7 +488,7 @@ class NeuralNetwork extends React.Component {
 
     // Connects two layers, modifies the nn object passed in, pass in the current edge ID counter
     // returns the new edge counter (to be updated in setState where this should be called)
-    connectLayers(layer1, layer2, nn, initialEdgeCounter) {
+    connectLayers = (layer1, layer2, nn, initialEdgeCounter) => {
         let edgeCounter = parseInt(initialEdgeCounter);
 
         nn.layers[layer1].nodes.forEach(layer1Node => {
@@ -510,7 +501,7 @@ class NeuralNetwork extends React.Component {
         return edgeCounter;
     }
 
-    findLayer(nodeId, state) {
+    findLayer = (nodeId, state) => {
         for (const layerId in state.nn.layers) {
             if (state.nn.layers[layerId].nodes.includes(nodeId)) {
                 return layerId;
@@ -520,7 +511,7 @@ class NeuralNetwork extends React.Component {
         return -1;
     }
 
-    drawNeuralNetwork() {
+    drawNeuralNetwork = () => {
         const nodes = this.state.nn.nodes;
         const edges = this.state.nn.edges;
 
@@ -562,7 +553,7 @@ class NeuralNetwork extends React.Component {
         }
     }
 
-    drawNode(nodeIndex) {
+    drawNode = nodeIndex => {
         const node = this.state.nn.nodes[nodeIndex];
 
         // draw outline to indicate that this node is selected
@@ -580,7 +571,7 @@ class NeuralNetwork extends React.Component {
         this.ctx.fill();
     }
 
-    calculateNodeYValues(numNodes) {
+    calculateNodeYValues = numNodes => {
         numNodes = parseInt(numNodes);
         const height = this.state.height;
         const result = [];
@@ -602,7 +593,7 @@ class NeuralNetwork extends React.Component {
         return result;
     }
 
-    getRandomWeight() {
+    getRandomWeight = () => {
         return this.round(Math.random() * 2 - 1, 3);
     }
 
@@ -611,7 +602,7 @@ class NeuralNetwork extends React.Component {
     the first layer to be updated should be passed in startingLayer
     nn will be updated to the correct values
      */
-    updateOutput(startingLayer, nn) {
+    updateOutput = (startingLayer, nn) => {
         // really gotta do something about this string number bs
         if (startingLayer !== 0 && startingLayer !== "0") {
             nn.layers[startingLayer].nodes.forEach(node => {
@@ -633,7 +624,7 @@ class NeuralNetwork extends React.Component {
         }
     }
 
-    applyActivationFunction(activationFunction, value, parameter) {
+    applyActivationFunction = (activationFunction, value, parameter) => {
         const func = activation_functions[activationFunction];
 
         // just default to no activation function
@@ -649,11 +640,11 @@ class NeuralNetwork extends React.Component {
         }
     }
 
-    round(num, decimals) {
+    round = (num, decimals) => {
         return Math.round((num + Number.EPSILON) * 10**decimals) / 10**decimals;
     }
 
-    render() {
+    render = () => {
         return (
             <div>
                 <div className="container">
