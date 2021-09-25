@@ -58,7 +58,7 @@ class NeuralNetwork extends React.Component {
         this.layers = 0;
 
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
-        this.colorChange = this.colorChange.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
         this.addLayer = this.addLayer.bind(this);
         this.addInputNode = this.addInputNode.bind(this);
         this.removeInputNode = this.removeInputNode.bind(this);
@@ -130,7 +130,7 @@ class NeuralNetwork extends React.Component {
         }
     }
 
-    colorChange(event) {
+    handleInputChange(event) {
         const value = event.target.value;
         const name = event.target.name;
         let toReturn;
@@ -629,7 +629,7 @@ class NeuralNetwork extends React.Component {
                                max={99}
                                min={1}
                                value={this.state.layerSize}
-                               onChange={this.colorChange}/>
+                               onChange={this.handleInputChange}/>
                         <button onClick={this.removeInputNode}>-</button>
                         <label>Input</label>
                         <button onClick={this.addInputNode}>+</button>
@@ -647,7 +647,7 @@ class NeuralNetwork extends React.Component {
                                           step={0.01}
                                           size={6}
                                           name={`node${nodeId}Input`}
-                                          onChange={this.colorChange}
+                                          onChange={this.handleInputChange}
                                           value={this.state[`node${nodeId}Input`]} />
                         })}
                         <label>Output:</label>
@@ -664,18 +664,18 @@ class NeuralNetwork extends React.Component {
                     <h2>{this.state.nodeSelected ? "Node" : "Edge"} Info</h2>
                     <p>ID: {this.state.selectedId}</p>
                     <label htmlFor="color-selector">Color: </label>
-                    <input type="color" value={this.state.selectedColor} onChange={this.colorChange}
+                    <input type="color" value={this.state.selectedColor} onChange={this.handleInputChange}
                            name="color-selector"/>
                     {this.state.nodeSelected ?
                         <div>
                             <label htmlFor="activation-function">Activation Function: </label>
-                            <select name="activation-selector" value={this.state.selectedActivationFunction} onChange={this.colorChange}>
+                            <select name="activation-selector" value={this.state.selectedActivationFunction} onChange={this.handleInputChange}>
                                 {activation_functions_list.map((fn, index) => {
                                     return <option id={index} key={fn}>{fn}</option>;
                                 })}
                             </select>
                             {parameterized_activation_functions.includes(this.state.selectedActivationFunction) &&
-                                <input name="activation-parameter" type="number" value={this.state.activationParameter} onChange={this.colorChange} step={0.001} />
+                                <input name="activation-parameter" type="number" value={this.state.activationParameter} onChange={this.handleInputChange} step={0.001} />
                             }
                             {this.state.selectedId !== -1 &&
                                 <div>
@@ -688,7 +688,7 @@ class NeuralNetwork extends React.Component {
                         </div> :
                         <div>
                             <label htmlFor="weight-selector">Weight: </label>
-                            <input name="weight-selector" type="number" value={this.state.selectedWeight} onChange={this.colorChange} step={0.001}/>
+                            <input name="weight-selector" type="number" value={this.state.selectedWeight} onChange={this.handleInputChange} step={0.001}/>
                         </div>}
                 </Popover>
             </div>
