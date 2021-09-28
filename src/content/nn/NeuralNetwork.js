@@ -33,9 +33,6 @@ const activation_functions = {
     "Swish": x => x / (1 + Math.exp(-x))
 }
 
-
-// TODO: Add bias to the nodes with an input similar to the edge weights and apply them to the calculations
-
 class NeuralNetwork extends React.Component {
     constructor(props) {
         super(props);
@@ -240,7 +237,7 @@ class NeuralNetwork extends React.Component {
     }
 
     handleClickObject = (id, isNode) => {
-        const toTogglePopover = this.popoverEnabled || this.state.selectedId === -1 || (id === this.state.selectedId && this.state.nodeSelected === isNode);
+        const toTogglePopover = !this.popoverEnabled || this.state.selectedId === -1 || (id === this.state.selectedId && this.state.nodeSelected === isNode);
 
         this.setState((prevState) => {
             const selectedColor = isNode ? prevState.nn.nodes[id].color : prevState.nn.edges[id].color;
@@ -526,7 +523,7 @@ class NeuralNetwork extends React.Component {
 
 
             // if it is selected, outline it
-            if (!this.state.nodeSelected && id === this.state.selectedId) {
+            if (this.popoverEnabled && !this.state.nodeSelected && id === this.state.selectedId) {
                 this.ctx.beginPath();
                 this.ctx.strokeStyle = outline_color;
                 this.ctx.lineWidth = Math.abs(edge.w) * 5 + selection_outline_radius * 2;
@@ -557,7 +554,7 @@ class NeuralNetwork extends React.Component {
         const node = this.state.nn.nodes[nodeIndex];
 
         // draw outline to indicate that this node is selected
-        if (this.state.nodeSelected && this.state.selectedId === nodeIndex) {
+        if (this.popoverEnabled && this.state.nodeSelected && this.state.selectedId === nodeIndex) {
             this.ctx.beginPath();
             this.ctx.fillStyle = outline_color;
             this.ctx.arc(node.x, node.y, node_radius + selection_outline_radius, 0, Math.PI * 2);

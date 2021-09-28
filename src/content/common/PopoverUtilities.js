@@ -7,7 +7,7 @@ export function togglePopover(id) {
         enablePopover(id);
     }
 
-    return vis === "visible";
+    return vis !== "visible";
 }
 
 export function enablePopover(id) {
