@@ -688,7 +688,10 @@ class NeuralNetwork extends React.Component {
                                 onClick={this.handleCanvasClick} className="canvas-outline"/>
                     </div>
                 </div>
-                <Popover popoverId={popover_id}>
+                <Popover popoverId={popover_id} closeFunction={() => {
+                    this.popoverEnabled = false;
+                    this.drawNeuralNetwork();
+                }}>
                     <h2>{this.state.nodeSelected ? "Node" : "Edge"} Info</h2>
                     <p>ID: {this.state.selectedId}</p>
                     <label htmlFor="color-selector">Color: </label>
