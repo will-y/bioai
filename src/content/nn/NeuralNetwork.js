@@ -56,6 +56,10 @@ class NeuralNetwork extends React.Component {
         this.canvasRef = React.createRef();
         this.popoverEnabled = false;
         this.layers = 0;
+
+        // used for controlling scroll
+        this.scrollX = 0;
+        this.scrollY = 0;
     }
 
     initializeNetwork = callback => {
@@ -108,7 +112,31 @@ class NeuralNetwork extends React.Component {
         return [x, y];
     }
 
+    onMouseDown = event => {
+        this.trackMouse = true;
+        this.initialMousePos = this.getMousePosition(this.canvasRef.current, event);
+        console.log("mouse down")
+    }
+
+    onMouseUp = () => {
+        this.trackMouse = false;
+    }
+
+    onMouseMove = event => {
+        if (this.trackMouse) {
+            const currentMousePos = this.getMousePosition(this.canvasRef.current, event);
+
+            this.scrollX += this.initialMousePos[0] - currentMousePos[0];
+            this.scrollY += this.initialMousePos[1] - currentMousePos[1];
+
+            this.initialMousePos = currentMousePos;
+
+            this.drawNeuralNetwork();
+        }
+    }
+
     handleCanvasClick = e => {
+        console.log('click')
         const clickPos = this.getMousePosition(this.canvasRef.current, e);
         const nodeClicked = this.detectClickNode(clickPos[0], clickPos[1]);
         if (nodeClicked !== -1) {
@@ -210,7 +238,7 @@ class NeuralNetwork extends React.Component {
         for (const nodeId in nodes) {
             const node = nodes[nodeId];
 
-            if (this.distance(node.x, node.y, x, y) <= node_radius) {
+            if (this.distance(node.x + this.scrollX, node.y + this.scrollY, x, y) <= node_radius) {
                 return nodeId;
             }
         }
@@ -226,9 +254,9 @@ class NeuralNetwork extends React.Component {
             const n1 = nodes[edge.n1];
             const n2 = nodes[edge.n2];
 
-            const dist = this.distanceToLine(n1.x, n1.y, n2.x, n2.y, x, y);
+            const dist = this.distanceToLine(n1.x + this.scrollX, n1.y + this.scrollY, n2.x + this.scrollX, n2.y + this.scrollY, x, y);
 
-            if (((n1.x < x && x < n2.x) || (n2.x < x && x < n1.x))
+            if (((n1.x + this.scrollX < x && x < n2.x + this.scrollX) || (n2.x + this.scrollX < x && x < n1.x + this.scrollX))
                 && (dist <= 10)) {
                 return edgeId;
             }
@@ -528,8 +556,8 @@ class NeuralNetwork extends React.Component {
                 this.ctx.strokeStyle = outline_color;
                 this.ctx.lineWidth = Math.abs(edge.w) * 5 + selection_outline_radius * 2;
 
-                this.ctx.moveTo(n1.x, n1.y);
-                this.ctx.lineTo(n2.x, n2.y);
+                this.ctx.moveTo(n1.x + this.scrollX, n1.y + this.scrollY);
+                this.ctx.lineTo(n2.x + this.scrollX, n2.y + this.scrollY);
 
                 this.ctx.stroke();
             }
@@ -539,8 +567,8 @@ class NeuralNetwork extends React.Component {
             this.ctx.strokeStyle = edge.color;
             this.ctx.lineWidth = Math.abs(edge.w) * 5;
 
-            this.ctx.moveTo(n1.x, n1.y);
-            this.ctx.lineTo(n2.x, n2.y);
+            this.ctx.moveTo(n1.x + this.scrollX, n1.y + this.scrollY);
+            this.ctx.lineTo(n2.x + this.scrollX, n2.y + this.scrollY);
             this.ctx.stroke();
         }
 
@@ -557,14 +585,14 @@ class NeuralNetwork extends React.Component {
         if (this.popoverEnabled && this.state.nodeSelected && this.state.selectedId === nodeIndex) {
             this.ctx.beginPath();
             this.ctx.fillStyle = outline_color;
-            this.ctx.arc(node.x, node.y, node_radius + selection_outline_radius, 0, Math.PI * 2);
+            this.ctx.arc(node.x + this.scrollX, node.y + this.scrollY, node_radius + selection_outline_radius, 0, Math.PI * 2);
             this.ctx.fill();
         }
 
         // draw node
         this.ctx.beginPath();
         this.ctx.fillStyle = node.color;
-        this.ctx.arc(node.x, node.y, node_radius, 0, Math.PI * 2);
+        this.ctx.arc(node.x + this.scrollX, node.y + this.scrollY, node_radius, 0, Math.PI * 2);
         this.ctx.fill();
     }
 
@@ -684,8 +712,14 @@ class NeuralNetwork extends React.Component {
                         })}
                     </div>}
                     <div className="row nn-canvas-container">
-                        <canvas width={this.state.width} height={this.state.height} ref={this.canvasRef}
-                                onClick={this.handleCanvasClick} className="canvas-outline"/>
+                        <canvas width={this.state.width}
+                                height={this.state.height}
+                                ref={this.canvasRef}
+                                onClick={this.handleCanvasClick}
+                                onMouseUp={this.onMouseUp}
+                                onMouseDown={this.onMouseDown}
+                                onMouseMove={this.onMouseMove}
+                                className="canvas-outline"/>
                     </div>
                 </div>
                 <Popover popoverId={popover_id} closeFunction={() => {
