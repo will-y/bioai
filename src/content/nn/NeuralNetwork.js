@@ -115,7 +115,6 @@ class NeuralNetwork extends React.Component {
     onMouseDown = event => {
         this.trackMouse = true;
         this.initialMousePos = this.getMousePosition(this.canvasRef.current, event);
-        console.log("mouse down")
     }
 
     onMouseUp = () => {
@@ -136,7 +135,6 @@ class NeuralNetwork extends React.Component {
     }
 
     handleCanvasClick = e => {
-        console.log('click')
         const clickPos = this.getMousePosition(this.canvasRef.current, e);
         const nodeClicked = this.detectClickNode(clickPos[0], clickPos[1]);
         if (nodeClicked !== -1) {
