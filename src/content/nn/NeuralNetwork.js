@@ -637,7 +637,7 @@ class NeuralNetwork extends React.Component {
                     }
                 });
 
-                nn.nodes[node].value = this.applyActivationFunction(nn.nodes[node].activationFunction, newValue, nn.nodes[node].activationParameter) + nn.nodes[node].bias;
+                nn.nodes[node].value = this.applyActivationFunction(nn.nodes[node].activationFunction, newValue + nn.nodes[node].bias, nn.nodes[node].activationParameter);
             });
         }
 
