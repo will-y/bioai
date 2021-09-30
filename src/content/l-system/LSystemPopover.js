@@ -8,7 +8,7 @@ class LSystemPopover extends React.Component {
                 <h2>L System Simulator</h2>
                 <h3>Background</h3>
                 <p>An L-System is a series of rules to modify an initial string (axiom). Each iteration, each character is replaced with another sequence of characters defined by the transition rules. More information can be found <a href="https://en.wikipedia.org/wiki/L-system" target="_blank" rel="noreferrer">here.</a></p>
-                <h2>How it Draws</h2>
+                <h3>How it Draws</h3>
                 <p>All an L-System does is generate a string based on an initial string and rules. This program takes this created string and then draws it with turtle graphics. It draws based on the following rules:</p>
                 <ul>
                     <li><span className="def">'-'</span> Rotate Left</li>

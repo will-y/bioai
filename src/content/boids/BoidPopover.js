@@ -7,7 +7,7 @@ class BoidPopover extends React.Component {
             <div>
                 <h2>Boids</h2>
                 <h3>Background</h3>
-                <p>Boids model a swarm of birds or other animals. Each boid's behavior (velocity) is determined by certain rules that have to do with other boids in its area. More information can ve found <a href="https://en.wikipedia.org/wiki/Boids" target="_blank" rel="noreferrer">here.</a></p>
+                <p>Boids model a swarm of birds or other animals. Each boid's behavior (velocity) is determined by certain rules that have to do with other boids in its area. More information can be found <a href="https://en.wikipedia.org/wiki/Boids" target="_blank" rel="noreferrer">here.</a></p>
                 <h3>Rules</h3>
                 <p>Rule 1: Boids try to go towards the center of mass of the flock.</p>
                 <p>Rule 2: Boids try to stay away from other nearby boids.</p>
